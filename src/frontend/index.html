@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Heart Pulse</title>
+    <script>
+        async function fetchPulse() {
+            const recordName = 'your_record_name'; // Replace with your record name
+            const response = await fetch(`/api/pulse/${recordName}`);
+            const data = await response.json();
+            if (response.ok) {
+                // Display the data (for simplicity, just log it)
+                console.log(data);
+                // You can add code here to visualize the data
+            } else {
+                console.error(data.error);
+            }
+        }
+
+        setInterval(fetchPulse, 1000); // Fetch data every second
+    </script>
+</head>
+<body>
+    <h1>Real-Time Heart Pulse</h1>
+    <div id="pulse-data"></div>
+</body>
+</html>
