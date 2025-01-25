@@ -8,6 +8,7 @@ async function renderECG() {
     const ecgData = await fetchECGData();
 
     const ctx = document.getElementById('ecgChart').getContext('2d');
+
     new Chart(ctx, {
         type: 'line',
         data: {
@@ -16,15 +17,24 @@ async function renderECG() {
                 label: 'ECG Signal',
                 data: ecgData,
                 borderColor: 'rgb(75, 192, 192)',
-                tension: 0.1
-            }]
+                tension: 0.1,
+                pointStyle: 'circle',
+                pointRadius: 1.5,
+            }],
         },
         options: {
             responsive: true,
+            animations: {
+                radius: {
+                    duration: 400,
+                    easing: 'linear',
+                    loop: (context) => context.active
+                },
+            },
             scales: {
                 x: { title: { display: true, text: 'Time (ms)' } },
                 y: { title: { display: true, text: 'Amplitude (mV)' } }
-            }
+            },
         }
     });
 }
