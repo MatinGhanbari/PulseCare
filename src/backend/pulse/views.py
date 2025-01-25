@@ -4,7 +4,11 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Item
 from .serializers import ItemSerializer
-from biosppy.signals import ecg
+
+# Load NeuroKit and other useful packages
+import neurokit2 as nk
+import numpy as np
+import pandas as pd
 
 # Create your views here.
 class ItemList(generics.ListCreateAPIView):
@@ -18,12 +22,19 @@ class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
 
 import wfdb
 @api_view(['GET'])
-def get_ecg_data(request, sampto=500):
-    record = wfdb.rdrecord(r'datasets/ahadb/0201')
+def get_ecg_data(request, length=400 ,sampto=10000):
+    record = wfdb.rdrecord(r'datasets/ahadb/0201', sampto=sampto)
 
-    out = ecg.ecg(signal=record.p_signal[:2000, 0], sampling_rate=record.fs, show=False)
+    # Delineate the ECG signal
+    ecg_signal = record.p_signal[:, 0]
+    _, rpeaks = nk.ecg_peaks(ecg_signal, sampling_rate=record.fs)
+    _, waves_peak = nk.ecg_delineate(ecg_signal, rpeaks, sampling_rate=record.fs, method="peak")
 
     return Response({
-        'ecg_data': record.p_signal.tolist()[:sampto],
-        'r_peaks': out['rpeaks'].tolist(),
+        'ecg_data': record.p_signal.tolist()[:length],
+        'r_peaks': rpeaks['ECG_R_Peaks'],
+        't_peaks': waves_peak['ECG_T_Peaks'][:3],
+        'p_peaks': waves_peak['ECG_P_Peaks'][:3],
+        'q_peaks': waves_peak['ECG_Q_Peaks'][:3],
+        's_peaks': waves_peak['ECG_S_Peaks'][:3],
     })
