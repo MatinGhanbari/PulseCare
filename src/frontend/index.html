@@ -4,49 +4,173 @@
     <meta charset="UTF-8">
     <title>Heart Pulse Project</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <link rel="icon" href="./assets/images/pulse.png" type="image/png">
     <link rel="stylesheet" href="./css/global.css">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="./js/index.js"></script>
+    <script src="https://flowbite.com/docs/flowbite.min.js"></script>
 </head>
 <body>
-<div class="bg-white">
-    <header class="absolute inset-x-0 top-0 z-50">
-        <nav class="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
-            <div class="flex lg:flex-1">
-                <a href="#" class="-m-1.5 p-1.5">
-                    <span class="sr-only">Your Company</span>
-                    <img class="h-8 w-auto" src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600" alt="">
+<div class="bg-image">
+    <!-- Static sidebar for desktop -->
+    <div class="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
+        <!-- Sidebar component, swap this element with another sidebar if you like -->
+        <div class="flex-1 flex flex-col min-h-0 bg-gray-600">
+            <div class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
+                <div class="flex items-center flex-shrink-0 px-4 text-white font-medium rounded-md">
+                    <img class="h-16 w-auto" src="./assets/images/pulse.png" alt="pulse"> PulseWave
+                </div>
+                <nav class="mt-5 flex-1 px-2 space-y-1">
+                    <!-- Current: "bg-gray-800 text-white", Default: "text-white hover:bg-gray-600 hover:bg-opacity-75" -->
+                    <a href="#"
+                       class="bg-gray-800 text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        <!-- Heroicon name: outline/home -->
+                        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-gray-300" xmlns="http://www.w3.org/2000/svg"
+                             fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        Dashboard
+                    </a>
+
+                    <a href="#"
+                       class="text-white hover:bg-gray-600 hover:bg-opacity-75 group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        <!-- Heroicon name: outline/users -->
+                        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-gray-300" xmlns="http://www.w3.org/2000/svg"
+                             fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        Team
+                    </a>
+
+                    <a href="#"
+                       class="text-white hover:bg-gray-600 hover:bg-opacity-75 group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        <!-- Heroicon name: outline/folder -->
+                        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-gray-300" xmlns="http://www.w3.org/2000/svg"
+                             fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                        </svg>
+                        Projects
+                    </a>
+
+                    <a href="#"
+                       class="text-white hover:bg-gray-600 hover:bg-opacity-75 group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        <!-- Heroicon name: outline/calendar -->
+                        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-gray-300" xmlns="http://www.w3.org/2000/svg"
+                             fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Calendar
+                    </a>
+
+                    <a href="#"
+                       class="text-white hover:bg-gray-600 hover:bg-opacity-75 group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        <!-- Heroicon name: outline/inbox -->
+                        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-gray-300" xmlns="http://www.w3.org/2000/svg"
+                             fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                        </svg>
+                        Documents
+                    </a>
+
+                    <a href="#"
+                       class="text-white hover:bg-gray-600 hover:bg-opacity-75 group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        <!-- Heroicon name: outline/chart-bar -->
+                        <svg class="mr-3 flex-shrink-0 h-6 w-6 text-gray-300" xmlns="http://www.w3.org/2000/svg"
+                             fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                        Reports
+                    </a>
+                </nav>
+            </div>
+            <div class="flex-shrink-0 flex border-t border-transparent p-4">
+                <a href="#" class="flex-shrink-0 w-full group block">
+                    <div class="flex items-center">
+                        <div>
+                            <img class="inline-block h-9 w-9 rounded-full" src="assets/images/user-profile.png"
+                                 alt="user-profile">
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-white">Matin Ghanbari</p>
+                            <p class="text-xs font-medium text-gray-200 group-hover:text-white">View profile</p>
+                        </div>
+                    </div>
                 </a>
             </div>
-            <div class="flex lg:hidden">
-                <button type="button" class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700">
-                    <span class="sr-only">Open main menu</span>
-                    <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                    </svg>
-                </button>
-            </div>
-<!--            <div class="hidden lg:flex lg:gap-x-12">-->
-<!--                <a href="#" class="text-sm/6 font-semibold text-gray-900">Product</a>-->
-<!--                <a href="#" class="text-sm/6 font-semibold text-gray-900">Features</a>-->
-<!--                <a href="#" class="text-sm/6 font-semibold text-gray-900">Marketplace</a>-->
-<!--                <a href="#" class="text-sm/6 font-semibold text-gray-900">Company</a>-->
-<!--            </div>-->
-<!--            <div class="hidden lg:flex lg:flex-1 lg:justify-end">-->
-<!--                <a href="#" class="text-sm/6 font-semibold text-gray-900">Log in <span aria-hidden="true">&rarr;</span></a>-->
-<!--            </div>-->
-        </nav>
-    </header>
-
-    <div class="relative isolate px-6 pt-14 lg:px-8">
-        <div class="pulse-container">
-            <canvas class="pulse" id="ecgChart"></canvas>
         </div>
     </div>
+    <div class="md:pl-64 flex flex-col flex-1">
+        <div class="sticky top-0 z-10 md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3 bg-gray-100">
+            <button type="button"
+                    class="-ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-500">
+                <span class="sr-only">Open sidebar</span>
+                <!-- Heroicon name: outline/menu -->
+                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+        </div>
+        <main class="flex-1">
+            <div class="py-6">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 flex">
+                    <h1 class="text-2xl font-semibold text-gray-900">Pulse signal</h1>
+                    <div class="bg-transparent text-center lg:px-4">
+                        <div class="p-1.5 bg-gray-500 items-center text-gray-100 leading-none lg:rounded-full flex lg:inline-flex"
+                             role="alert">
+                            <span class="flex rounded-full bg-gray-600 uppercase px-2 py-1 text-xs font-bold mr-3">Note</span>
+                            <span class="font-semibold mr-2 text-left flex-auto">This project still under development!</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                    <div class="pulse-container">
+                        <div id="test">
+<!--                            <div class="rounded-md h-12 w-12 border-4 border-t-4 border-blue-500 animate-spin absolute"></div>-->
+                            <div class="wave-container">
+                                <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                                <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                                <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                                <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                                <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                            </div>
+                        </div>
+                        <canvas class="pulse" id="ecgChart" style="display: none;"></canvas>
+                    </div>
+
+                    <div class="inline-flex">
+                        <button onclick="prevFrame()"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l">
+                            Prev
+                        </button>
+                        <button onclick="nextFrame()"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r">
+                            Next
+                        </button>
+                        <div id="test2" style="margin-left: 20px;display: none">
+                            <div class="wave-container">
+                                <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                                <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                                <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                                <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                                <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </main>
+    </div>
 </div>
-
-
+<script src="./js/index.js"></script>
 </body>
 </html>

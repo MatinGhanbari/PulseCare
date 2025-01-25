@@ -1,80 +1,52 @@
-async function fetchECGData() {
-    const response = await fetch('http://127.0.0.1:8000/api/ecg/?format=json');
+async function fetchECGData(frame = 0, frame_size = 200) {
+    const start = frame * frame_size;
+    const response = await fetch(`http://127.0.0.1:8000/api/ecg?format=json&start=${start}&length=${frame_size}`);
     return await response.json();
 }
 
-function maxValue(ctx) {
-    let max = 0;
-    const dataset = ctx.chart.data.datasets[0];
-    dataset.data.forEach(function(el) {
-        max = Math.max(max, el);
-    });
-    return max;
-}
-
-function maxIndex(ctx) {
-    const max = maxValue(ctx);
-    const dataset = ctx.chart.data.datasets[0];
-    return dataset.data.indexOf(max);
-}
-
-function maxLabel(ctx) {
-    return ctx.chart.data.labels[maxIndex(ctx)];
-}
-
-async function renderECG() {
-    const ecg = await fetchECGData();
+function processECGData(ecg) {
+    const start = frame * frame_size;
     const ecg_data = ecg.ecg_data;
-    const r_peaks_data = ecg.r_peaks.filter(x => x < ecg_data.length).map(x => [x, ecg_data[x][1]]);
-    const t_peaks_data = ecg.t_peaks.filter(x => x < ecg_data.length).map(x => [x, ecg_data[x][1]]);
-    const p_peaks_data = ecg.p_peaks.filter(x => x < ecg_data.length).map(x => [x, ecg_data[x][1]]);
-    const q_peaks_data = ecg.q_peaks.filter(x => x < ecg_data.length).map(x => [x, ecg_data[x][1]]);
-    const s_peaks_data = ecg.s_peaks.filter(x => x < ecg_data.length).map(x => [x, ecg_data[x][1]]);
+    const peaks = ['r_peaks', 't_peaks', 'p_peaks', 'q_peaks', 's_peaks'].reduce((acc, peak) => {
+        acc[peak] = ecg[peak].filter(x => x <  start + ecg_data.length).map(x => [x, ecg_data[x][1]]);
+        return acc;
+    }, {});
+    return {ecg_data, peaks};
+}
+
+async function updateChartData(ecg) {
+    const {ecg_data, peaks} = processECGData(ecg);
+
+    // Update labels and datasets
+    chart.data.labels = Array.from({length: ecg_data.length}, (_, i) => i);
+    chart.data.datasets.forEach((dataset, index) => {
+        if (index < 5) { // For peak datasets
+            dataset.data = peaks[Object.keys(peaks)[index]];
+        } else { // For ECG signal dataset
+            dataset.data = ecg_data;
+        }
+    });
+
+    chart.update();
+    console.log("Chart updated");
+}
+
+async function renderECG(frame = 0, frame_size = 200) {
+    const ecg = await fetchECGData(frame, frame_size);
+    const {ecg_data, peaks} = processECGData(ecg);
 
     const ctx = document.getElementById('ecgChart').getContext('2d');
 
-    console.log(ecg_data[126]);
-
-    new Chart(ctx, {
+    chart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: Array.from({ length: ecg_data.length }, (_, i) => i),
+            labels: Array.from({length: ecg_data.length}, (_, i) => i),
             datasets: [
-                {
-                    type: 'bubble',
-                    label: 'R Peaks',
-                    data: r_peaks_data,
-                    borderColor: 'rgb(220,8,8)',
-                    pointRadius: 5,
-                },
-                {
-                    type: 'bubble',
-                    label: 'T Peaks',
-                    data: t_peaks_data,
-                    borderColor: 'rgb(0,124,9)',
-                    pointRadius: 5,
-                },
-                {
-                    type: 'bubble',
-                    label: 'P Peaks',
-                    data: p_peaks_data,
-                    borderColor: 'rgb(255,99,132)',
-                    pointRadius: 5,
-                },
-                {
-                    type: 'bubble',
-                    label: 'Q Peaks',
-                    data: q_peaks_data,
-                    borderColor: 'rgb(173,185,0)',
-                    pointRadius: 5,
-                },
-                {
-                    type: 'bubble',
-                    label: 'S Peaks',
-                    data: s_peaks_data,
-                    borderColor: 'rgb(185,56,0)',
-                    pointRadius: 5,
-                },
+                {type: 'bubble', label: 'R Peak', data: peaks.r_peaks, borderColor: 'rgb(220,8,8)', pointRadius: 5},
+                {type: 'bubble', label: 'T Peak', data: peaks.t_peaks, borderColor: 'rgb(0,124,9)', pointRadius: 5},
+                {type: 'bubble', label: 'P Peak', data: peaks.p_peaks, borderColor: 'rgb(255,99,132)', pointRadius: 5},
+                {type: 'bubble', label: 'Q Peak', data: peaks.q_peaks, borderColor: 'rgb(173,185,0)', pointRadius: 5},
+                {type: 'bubble', label: 'S Peak', data: peaks.s_peaks, borderColor: 'rgb(185,56,0)', pointRadius: 5},
                 {
                     type: 'line',
                     label: 'ECG Signal',
@@ -84,21 +56,21 @@ async function renderECG() {
                     tension: 0.2,
                     pointStyle: 'circle',
                     pointRadius: 0.5,
-                    fill: true,
+                    fill: true
                 },
             ],
         },
         options: {
             responsive: true,
             scales: {
-                x: { title: { display: true, text: 'Time (ms)' } },
-                y: { title: { display: true, text: 'Amplitude (mV)' } }
+                x: {title: {display: true, text: 'Time (ms)'}},
+                y: {title: {display: true, text: 'Amplitude (mV)'}}
             },
             plugins: {
                 annotation: {
                     clip: false,
                     annotations: {
-                        annotation1 : {
+                        annotation1: {
                             type: 'point',
                             backgroundColor: 'rgba(0, 255, 255, 0.4)',
                             borderColor: 'black',
@@ -112,6 +84,35 @@ async function renderECG() {
             }
         }
     });
+
+    console.log("Chart rendered");
 }
 
-renderECG();
+async function prevFrame() {
+    if (frame <= 0) return;
+    document.querySelector("#test2").style.display="block";
+    frame--;
+    console.log(frame);
+    const ecg = await fetchECGData(frame, frame_size);
+    await updateChartData(ecg);
+    document.querySelector("#test2").style.display="none";
+}
+
+async function nextFrame() {
+    document.querySelector("#test2").style.display="block";
+    frame++;
+    console.log(frame);
+    const ecg = await fetchECGData(frame, frame_size);
+    await updateChartData(ecg);
+    document.querySelector("#test2").style.display="none";
+}
+
+// Initialize variables
+let frame = 0;
+const frame_size = 500;
+
+// Start rendering the ECG chart
+renderECG(frame, frame_size).then(()=>{
+    document.querySelector("#test").style.display="none";
+    document.querySelector("#ecgChart").style.display="block";
+});
