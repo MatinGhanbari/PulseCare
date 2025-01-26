@@ -83,17 +83,20 @@
         const formData = new FormData(event.target);
         const response = await fetch("http://localhost:8000/api/signup", {
             method: 'POST',
-            body: formData,
+            body: JSON.stringify({
+                "username": formData.get("useremail"),
+                "password": formData.get("userpassword"),
+            }),
             headers: {
                 'X-CSRFToken': '{{ csrf_token }}'  // Include CSRF token
             }
         });
 
         if (response.ok) {
-            window.location.href = '/login';  // Redirect on success
+            window.location.href = './dashboard.html';  // Redirect on success
         } else {
-            const errorText = await response.text();
-            alert(errorText);  // Show error message
+            const errorText = await response.json();
+            alert(errorText.error);  // Show error message
         }
     }
 </script>

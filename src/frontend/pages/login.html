@@ -27,7 +27,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <form action="" method="POST">
+                    <form method="POST" onsubmit="loginUser(event)">
                         <td class="label-td">
                             <label for="useremail" class="form-label">Email: </label>
                         </td>
@@ -76,5 +76,28 @@
 
     </div>
 </center>
+<script>
+    async function loginUser(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const response = await fetch("http://localhost:8000/api/login", {
+            method: 'POST',
+            body: JSON.stringify({
+                "username": formData.get("useremail"),
+                "password": formData.get("userpassword"),
+            }),
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'  // Include CSRF token
+            }
+        });
+
+        if (response.ok) {
+            window.location.href = './dashboard.html';  // Redirect on success
+        } else {
+            const errorText = await response.json();
+            alert(errorText.error);  // Show error message
+        }
+    }
+</script>
 </body>
 </html>
