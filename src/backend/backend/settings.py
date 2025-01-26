@@ -25,8 +25,10 @@ SECRET_KEY = 'django-insecure-q2a+rgah5)jiv6-c6s76l)3*=z4-y$3w$gl8&&jb!dbt@55xhi
 DEBUG = True
 
 CORS_ALLOW_ALL_ORIGINS = True
-
 ALLOWED_HOSTS = []
+
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = 6379
 
 # Application definition
 

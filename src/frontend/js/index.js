@@ -8,7 +8,7 @@ function processECGData(ecg) {
     const start = frame * frame_size;
     const ecg_data = ecg.ecg_data;
     const peaks = ['r_peaks', 't_peaks', 'p_peaks', 'q_peaks', 's_peaks'].reduce((acc, peak) => {
-        acc[peak] = ecg[peak].filter(x => x <  start + ecg_data.length).map(x => [x, ecg_data[x][1]]);
+        acc[peak] = ecg[peak].filter(x => x < start + ecg_data.length).map(x => [x, ecg_data[x][1]]);
         return acc;
     }, {});
     return {ecg_data, peaks};
@@ -42,11 +42,11 @@ async function renderECG(frame = 0, frame_size = 200) {
         data: {
             labels: Array.from({length: ecg_data.length}, (_, i) => i),
             datasets: [
-                {type: 'bubble', label: 'R Peak', data: peaks.r_peaks, borderColor: 'rgb(220,8,8)', pointRadius: 5},
-                {type: 'bubble', label: 'T Peak', data: peaks.t_peaks, borderColor: 'rgb(0,124,9)', pointRadius: 5},
-                {type: 'bubble', label: 'P Peak', data: peaks.p_peaks, borderColor: 'rgb(255,99,132)', pointRadius: 5},
-                {type: 'bubble', label: 'Q Peak', data: peaks.q_peaks, borderColor: 'rgb(173,185,0)', pointRadius: 5},
-                {type: 'bubble', label: 'S Peak', data: peaks.s_peaks, borderColor: 'rgb(185,56,0)', pointRadius: 5},
+                {type: 'bubble', label: 'R Peak', data: peaks.r_peaks, borderColor: 'rgb(220,8,8)', pointRadius: 8},
+                {type: 'bubble', label: 'T Peak', data: peaks.t_peaks, borderColor: 'rgb(0,124,9)', pointRadius: 8},
+                {type: 'bubble', label: 'P Peak', data: peaks.p_peaks, borderColor: 'rgb(255,99,132)', pointRadius: 8},
+                {type: 'bubble', label: 'Q Peak', data: peaks.q_peaks, borderColor: 'rgb(173,185,0)', pointRadius: 8},
+                {type: 'bubble', label: 'S Peak', data: peaks.s_peaks, borderColor: 'rgb(185,56,0)', pointRadius: 8},
                 {
                     type: 'line',
                     label: 'ECG Signal',
@@ -90,29 +90,29 @@ async function renderECG(frame = 0, frame_size = 200) {
 
 async function prevFrame() {
     if (frame <= 0) return;
-    document.querySelector("#test2").style.display="block";
+    document.querySelector("#page-loader").style.display = "block";
     frame--;
     console.log(frame);
     const ecg = await fetchECGData(frame, frame_size);
     await updateChartData(ecg);
-    document.querySelector("#test2").style.display="none";
+    document.querySelector("#page-loader").style.display = "none";
 }
 
 async function nextFrame() {
-    document.querySelector("#test2").style.display="block";
+    document.querySelector("#page-loader").style.display = "block";
     frame++;
     console.log(frame);
     const ecg = await fetchECGData(frame, frame_size);
     await updateChartData(ecg);
-    document.querySelector("#test2").style.display="none";
+    document.querySelector("#page-loader").style.display = "none";
 }
 
 // Initialize variables
 let frame = 0;
-const frame_size = 500;
+const frame_size = 400;
 
 // Start rendering the ECG chart
-renderECG(frame, frame_size).then(()=>{
-    document.querySelector("#test").style.display="none";
-    document.querySelector("#ecgChart").style.display="block";
+renderECG(frame, frame_size).then(() => {
+    document.querySelector("#wave-loader").style.display = "none";
+    document.querySelector("#ecgChart").style.display = "block";
 });

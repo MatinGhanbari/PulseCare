@@ -80,3 +80,7 @@ canvas {
         transform: scaleY(1);
     }
 }
+
+table{
+    animation: transitionIn-Y-bottom 0.5s;
+}
