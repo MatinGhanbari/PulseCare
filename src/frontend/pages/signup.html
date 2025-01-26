@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/signup.css">
+    <link rel="icon" href="../assets/images/pulse.png" type="image/png">
+    <title>Sign Up</title>
+
+</head>
+<body>
+<center>
+    <div class="container">
+        <table border="0" style="margin: 0;padding: 0;width: 60%;">
+            <tr>
+                <td>
+                    <p class="header-text">Let's Get Started</p>
+                </td>
+            </tr>
+
+            <div class="form-body">
+                <tr>
+                    <td>
+                        <p class="sub-text">Add Your Personal Details to Continue</p>
+                    </td>
+                </tr>
+                <tr>
+                    <form action="" method="POST" onsubmit="registerUser(event)">
+                        <td class="label-td">
+                            <label for="useremail" class="form-label">Email: </label>
+                        </td>
+                </tr>
+                <tr>
+                    <td class="label-td">
+                        <input type="email" name="useremail" class="input-text" placeholder="Email Address" required>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label-td">
+                        <label for="userpassword" class="form-label">Password: </label>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label-td">
+                        <input type="Password" name="userpassword" class="input-text" placeholder="Password" required>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="label-td">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <input type="submit" value="Next" class="login-btn btn-primary btn">
+                    </td>
+
+                </tr>
+            </div>
+            <tr>
+                <td>
+                    <br>
+                    <label for="" class="sub-text" style="font-weight: 280;">Already have an account&#63; </label>
+                    <a href="./login.html" class="hover-link1 non-style-link">Login</a>
+                    <br><br><br>
+                </td>
+            </tr>
+
+            </form>
+            </tr>
+        </table>
+
+    </div>
+</center>
+<script>
+    async function registerUser(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const response = await fetch("http://localhost:8000/api/signup", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'  // Include CSRF token
+            }
+        });
+
+        if (response.ok) {
+            window.location.href = '/login';  // Redirect on success
+        } else {
+            const errorText = await response.text();
+            alert(errorText);  // Show error message
+        }
+    }
+</script>
+</body>
+</html>
