@@ -11,7 +11,11 @@ body{
     padding: 0;
     border-spacing: 0;
     font-family: 'Inter', sans-serif;
-    
+    /*background-image: url("https://img.freepik.com/free-photo/cement-texture_1194-5360.jpg");*/
+    /*background-repeat: no-repeat;*/
+    /*background-size: cover;*/
+    /*background-position: center;*/
+    /*background-clip: unset;*/
 }
 
 *, ::after, ::before{
@@ -341,7 +345,7 @@ input[type=search]:focus {
 .menu-active{
   color: var(--primarycolor);
   border-right: 7px solid var(--primarycolor);
-  background-color: var();
+  background-color: rgba(207, 228, 243, 0.38);
 }
 
 .menu-btn:hover{

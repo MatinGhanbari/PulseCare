@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://flowbite.com/docs/flowbite.min.js"></script>
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <title>Patients</title>
+    <style>
+        .dashbord-tables, .doctor-heade {
+            animation: transitionIn-Y-over 0.5s;
+        }
+
+        .filter-container {
+            animation: transitionIn-Y-bottom 0.5s;
+        }
+
+        .sub-table, #anim {
+            animation: transitionIn-Y-bottom 0.5s;
+        }
+
+        .doctor-heade {
+            animation: transitionIn-Y-over 0.5s;
+        }
+    </style>
+
+</head>
+<body>
+<div class="container">
+    <div class="menu">
+        <table class="menu-container" border="0">
+            <tr>
+                <td style="padding:10px" colspan="2">
+                    <table border="0" class="profile-container">
+                        <tr>
+                            <td width="30%" style="padding-left:20px">
+                                <img src="../assets/images/user.png" alt="" width="100%" style="border-radius:50%">
+                            </td>
+                            <td style="padding:0px;margin:0px;">
+                                <p class="profile-title username-field">Matin Ghanbari</p>
+                                <p class="profile-subtitle">Admin</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <input type="button" value="Log out" onclick="logoutUser()"
+                                       class="logout-btn btn-primary-soft btn">
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr class="menu-row">
+                <td class="menu-btn menu-icon-dashbord">
+                    <a href="./dashboard.html" class="non-style-link-menu">
+                        <div><p class="menu-text">Dashboard</p>
+                    </a>
+                </td>
+            </tr>
+            <tr class="menu-row">
+                <td class="menu-btn menu-icon-patient menu-active menu-icon-patient-active">
+                    <a href="./patients.html" class="non-style-link-menu non-style-link-menu-active">
+                        <div>
+                            <p class="menu-text">Patients</p>
+                        </div>
+                    </a>
+                </td>
+            </tr>
+    </div>
+    </a>
+
+
+    </table>
+</div>
+<div class="dash-body" style="margin-top: 15px">
+    <table border="0" width="100%" style=" border-spacing: 0;margin:0;padding:0;">
+        <tr>
+            <td colspan="1" class="nav-bar">
+                <p style="font-size: 23px;padding-left:12px;font-weight: 600;margin-left:20px;"> Patients</p>
+
+            </td>
+            <td width="25%">
+
+            </td>
+            <td width="15%">
+                <p style="font-size: 14px;color: rgb(119, 119, 119);padding: 0;margin: 0;text-align: right;">
+                    Today's Date and Time
+                </p>
+                <p class="heading-sub12" style="padding: 0;margin: 0;" id="live-datetime">
+
+                </p>
+            </td>
+            <td width="10%">
+                <button class="btn-label" style="display: flex;justify-content: center;align-items: center;"><img
+                        src="../assets/images/calendar.svg" width="100%"></button>
+            </td>
+
+
+        </tr>
+        <tr>
+            <td colspan="4">
+                <table border="0" width="100%">
+                    <tr>
+                        <td width="50%">
+                            <center>
+                                <table class="filter-container" style="border: none;" border="0">
+
+                                    <tr>
+                                        <td style="width: 25%;">
+                                            <div class="dashboard-items dataset-active" id="apnea-ecg/x01"
+                                                 onclick="changeData('apnea-ecg/x01');"
+                                                 style="cursor:pointer;padding:20px;margin:auto;width:95%;display: flex;justify-content: space-between;">
+                                                <div>
+                                                    <div class="h1-dashboard">
+                                                        x01
+                                                    </div>
+                                                    <br>
+                                                    <div class="h3-dashboard">
+                                                        apnea-ecg
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="width: 25%;">
+                                            <div class="dashboard-items" id="apnea-ecg/x02"
+                                                 onclick="changeData('apnea-ecg/x02');"
+                                                 style="cursor:pointer;padding:20px;margin:auto;width:95%;display: flex;justify-content: space-between;">
+                                                <div>
+                                                    <div class="h1-dashboard">
+                                                        x02
+                                                    </div>
+                                                    <br>
+                                                    <div class="h3-dashboard">
+                                                        apnea-ecg
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="width: 25%;">
+                                            <div class="dashboard-items" id="apnea-ecg/x03"
+                                                 onclick="changeData('apnea-ecg/x03');"
+                                                 style="cursor:pointer;padding:20px;margin:auto;width:95%;display: flex;justify-content: space-between;">
+                                                <div>
+                                                    <div class="h1-dashboard">
+                                                        x03
+                                                    </div>
+                                                    <br>
+                                                    <div class="h3-dashboard">
+                                                        apnea-ecg
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="width: 25%;">
+                                            <div class="dashboard-items" id="apnea-ecg/x05"
+                                                 onclick="changeData('apnea-ecg/x05');"
+                                                 style="cursor:pointer;padding:20px;margin:auto;width:95%;display: flex;justify-content: space-between;">
+                                                <div>
+                                                    <div class="h1-dashboard">
+                                                        x05
+                                                    </div>
+                                                    <br>
+                                                    <div class="h3-dashboard">
+                                                        apnea-ecg
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <div class="py-6">
+                                    <!--                                    <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 flex">-->
+                                    <!--                                        <h1 class="text-2xl font-semibold text-gray-900">Pulse</h1>-->
+                                    <!--                                    </div>-->
+
+                                    <div>
+                                        <div id="wave-loader">
+                                            <div class="wave-container">
+                                                <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                                                <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                                                <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                                                <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                                                <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                                            </div>
+                                        </div>
+                                        <canvas class="pulse" id="ecgChart" style="display: none;"></canvas>
+                                    </div>
+                                </div>
+                            </center>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        <tr>
+    </table>
+</div>
+<script src="../js/index.js"></script>
+<script>
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+
+    let data_path = 'datasets/apnea-ecg/x01';
+
+    let frame = 0;
+    let frame_size = 250;
+    let sampto = frame_size * 2 < 1000 ? 1000 : frame_size * 2;
+
+    var chart = null;
+    renderECG(data_path, frame, frame_size).then(chartres => {
+        chart = chartres;
+        document.querySelector("#wave-loader").style.display = "none";
+        document.querySelector("#ecgChart").style.display = "block";
+    });
+</script>
+</body>
+</html>

@@ -9,8 +9,6 @@ from django.contrib import messages
 from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required
 
 from .models import Item
 from .serializers import ItemSerializer
@@ -30,12 +28,27 @@ class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 @api_view(['GET'])
+def user_logout(request):
+    if request.method == 'GET':
+        response = Response(data={'message': 'Logout successful!'}, status=200)
+        response.delete_cookie('username')
+        request.session.flush()
+        return response
+
+
+@api_view(['GET'])
+def getme(request):
+    if request.method == 'GET':
+        return Response(data={'user': str(request.user.username)}, status=200)
+
+
+@api_view(['GET'])
 def get_ecg_data(request):
     start = int(request.GET.get('start', 0))
     length = int(request.GET.get('length', 500))
     sampto = int(request.GET.get('sampto', 10_000))
+    data_path = str(request.GET.get('data_path', r'datasets/apnea-ecg/x01'))
 
-    data_path = r'datasets/apnea-ecg/x08'
     try:
         record = wfdb.rdrecord(data_path, sampto=sampto)
     except ValueError as e:
@@ -67,7 +80,7 @@ def get_ecg_data(request):
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
-@csrf_exempt
+
 @api_view(['POST'])
 def register(request):
     if request.method == 'POST':
@@ -87,12 +100,12 @@ def register(request):
         # Store user data in Redis
         redis_client.hset(username, 'password', hash_password(password))
         messages.success(request, 'Registration successful!')
+        request.session['username'] = username
         return Response(data={'message': 'Registration successful!'}, status=200)
 
     return Response(data={'error': 'request method error'}, status=400)
 
 
-@csrf_exempt
 @api_view(['POST'])
 def user_login(request):
     if request.method == 'POST':
@@ -109,17 +122,14 @@ def user_login(request):
             stored_password = redis_client.hget(username, 'password').decode()
             if stored_password == hash_password(password):
                 request.session['username'] = username
-                return Response(data={'message': 'Login successful!'}, status=200)
+
+                # Set a cookie with the username
+                response = Response(data={'message': 'Login successful!'}, status=200)
+                response.set_cookie(key='username', value=username, httponly=True)  # Set httponly to prevent JS access
+                return response
             else:
                 messages.error(request, 'Invalid credentials')
         else:
             messages.error(request, 'User does not exist')
 
-    return Response(data={'error': 'login error'}, status=400)
-
-
-@csrf_exempt
-@api_view(['POST'])
-def user_logout(request):
-    request.session.flush()
-    return Response(data={'message': 'successful!'}, status=200)
+    return Response(data={'error': 'Invalid username and password'}, status=400)

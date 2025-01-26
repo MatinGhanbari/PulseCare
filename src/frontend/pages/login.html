@@ -64,9 +64,11 @@
             <tr>
                 <td>
                     <br>
-                    <label for="" class="sub-text" style="font-weight: 280;">Don't have an account&#63; </label>
+                    <label class="sub-text" style="font-weight: 280;">Don't have an account&#63; </label>
                     <a href="./signup.html" class="hover-link1 non-style-link">Sign Up</a>
                     <br><br><br>
+                    <a href="../index.html" class="hover-link1 non-style-link">Back to Home</a>
+                    <br><br>
                 </td>
             </tr>
 
@@ -76,28 +78,6 @@
 
     </div>
 </center>
-<script>
-    async function loginUser(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const response = await fetch("http://localhost:8000/api/login", {
-            method: 'POST',
-            body: JSON.stringify({
-                "username": formData.get("useremail"),
-                "password": formData.get("userpassword"),
-            }),
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}'  // Include CSRF token
-            }
-        });
-
-        if (response.ok) {
-            window.location.href = './dashboard.html';  // Redirect on success
-        } else {
-            const errorText = await response.json();
-            alert(errorText.error);  // Show error message
-        }
-    }
-</script>
+<script src="../js/index.js"></script>
 </body>
 </html>

@@ -65,9 +65,11 @@
             <tr>
                 <td>
                     <br>
-                    <label for="" class="sub-text" style="font-weight: 280;">Already have an account&#63; </label>
+                    <label class="sub-text" style="font-weight: 280;">Already have an account&#63; </label>
                     <a href="./login.html" class="hover-link1 non-style-link">Login</a>
                     <br><br><br>
+                    <a href="../index.html" class="hover-link1 non-style-link">Back to Home</a>
+                    <br><br>
                 </td>
             </tr>
 
@@ -77,28 +79,6 @@
 
     </div>
 </center>
-<script>
-    async function registerUser(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const response = await fetch("http://localhost:8000/api/signup", {
-            method: 'POST',
-            body: JSON.stringify({
-                "username": formData.get("useremail"),
-                "password": formData.get("userpassword"),
-            }),
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}'  // Include CSRF token
-            }
-        });
-
-        if (response.ok) {
-            window.location.href = './dashboard.html';  // Redirect on success
-        } else {
-            const errorText = await response.json();
-            alert(errorText.error);  // Show error message
-        }
-    }
-</script>
+<script src="../js/index.js"></script>
 </body>
 </html>

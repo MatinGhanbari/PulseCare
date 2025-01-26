@@ -1,6 +1,13 @@
-async function fetchECGData(frame = 0, frame_size = 200) {
+async function fetchECGData(data_path, frame = 0, frame_size = 200) {
     const start = frame * frame_size;
-    const response = await fetch(`http://127.0.0.1:8000/api/ecg?format=json&start=${start}&length=${frame_size}`);
+    const response = await fetch(`http://127.0.0.1:8000/api/ecg?format=json&sampto=${sampto}&start=${start}&length=${frame_size}&data_path=${data_path}`, {
+        method: 'GET',
+        credentials: "include"
+    });
+    if (!response.ok) {
+        window.location.assign("../pages/login.html");
+        return;
+    }
     return await response.json();
 }
 
@@ -31,8 +38,8 @@ async function updateChartData(ecg) {
     console.log("Chart updated");
 }
 
-async function renderECG(frame = 0, frame_size = 200) {
-    const ecg = await fetchECGData(frame, frame_size);
+async function renderECG(data_path, frame = 0, frame_size = 200) {
+    const ecg = await fetchECGData(data_path, frame, frame_size);
     const {ecg_data, peaks} = processECGData(ecg);
 
     const ctx = document.getElementById('ecgChart').getContext('2d');
@@ -52,10 +59,10 @@ async function renderECG(frame = 0, frame_size = 200) {
                     label: 'ECG Signal',
                     data: ecg_data,
                     borderColor: 'rgb(75, 192, 192)',
-                    backgroundColor: 'rgba(100,100,100,0.15)',
+                    backgroundColor: 'rgba(100,100,100,0.27)',
                     tension: 0.2,
                     pointStyle: 'circle',
-                    pointRadius: 0.5,
+                    pointRadius: 0.2,
                     fill: true
                 },
             ],
@@ -85,7 +92,22 @@ async function renderECG(frame = 0, frame_size = 200) {
         }
     });
 
-    console.log("Chart rendered");
+    console.log("chart rendered!")
+    return chart;
+}
+
+async function changeData(dataset) {
+    const last_data = document.getElementById(data_path.replace("datasets/", ""));
+    last_data.classList.remove("dataset-active");
+
+    data_path = `datasets/${dataset}`;
+    frame = 0;
+
+    const ecg = await fetchECGData(data_path, frame, frame_size);
+    await updateChartData(ecg);
+
+    const new_data = document.getElementById(dataset);
+    new_data.classList.add("dataset-active");
 }
 
 async function prevFrame() {
@@ -93,7 +115,7 @@ async function prevFrame() {
     document.querySelector("#page-loader").style.display = "block";
     frame--;
     console.log(frame);
-    const ecg = await fetchECGData(frame, frame_size);
+    const ecg = await fetchECGData(data_path, frame, frame_size);
     await updateChartData(ecg);
     document.querySelector("#page-loader").style.display = "none";
 }
@@ -102,17 +124,88 @@ async function nextFrame() {
     document.querySelector("#page-loader").style.display = "block";
     frame++;
     console.log(frame);
-    const ecg = await fetchECGData(frame, frame_size);
+    const ecg = await fetchECGData(data_path, frame, frame_size);
     await updateChartData(ecg);
     document.querySelector("#page-loader").style.display = "none";
 }
 
-// Initialize variables
-let frame = 0;
-const frame_size = 400;
+function updateDateTime() {
+    const now = new Date();
+    const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true // Set to false for 24-hour format
+    };
+    const formattedDateTime = now.toLocaleString('en-US', options);
+    document.getElementById('live-datetime').innerText = formattedDateTime;
+}
 
-// Start rendering the ECG chart
-renderECG(frame, frame_size).then(() => {
-    document.querySelector("#wave-loader").style.display = "none";
-    document.querySelector("#ecgChart").style.display = "block";
-});
+async function logoutUser(event) {
+    const response = await fetch("http://127.0.0.1:8000/api/logout", {
+        method: 'GET',
+        credentials: "include"
+    });
+
+    if (response.ok) {
+        window.location.assign("../index.html");
+    } else {
+        window.location.assign("../pages/login.html");
+    }
+}
+
+async function getUser(event) {
+    const response = await fetch("http://127.0.0.1:8000/api/getme", {
+        method: 'GET',
+        credentials: "include"
+    });
+
+    if (response.ok) {
+        return response.json();
+    } else {
+        window.location.assign("../pages/login.html");
+    }
+}
+
+async function loginUser(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const response = await fetch("http://127.0.0.1:8000/api/login", {
+        method: 'POST',
+        body: JSON.stringify({
+            "username": formData.get("useremail"),
+            "password": formData.get("userpassword"),
+        }),
+        credentials: "include"
+    });
+
+    if (response.ok) {
+        window.location.href = './dashboard.html';  // Redirect on success
+    } else {
+        const errorText = await response.json();
+        alert(errorText.error);  // Show error message
+    }
+}
+
+async function registerUser(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const response = await fetch("http://127.0.0.1:8000/api/signup", {
+        method: 'POST',
+        body: JSON.stringify({
+            "username": formData.get("useremail"),
+            "password": formData.get("userpassword"),
+        }),
+        credentials: "include"
+    });
+
+    if (response.ok) {
+        window.location.href = './dashboard.html';  // Redirect on success
+    } else {
+        const errorText = await response.json();
+        alert(errorText.error);  // Show error message
+    }
+}
