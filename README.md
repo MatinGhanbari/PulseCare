@@ -1,6 +1,12 @@
 # PulseCare
 Web-based application designed to visualize heart pulse data through an interactive and user-friendly interface. 
 
+# How to run
+clone project and go to the project directory and execute this command:
+
+`docker compose up --build -d`
+
+# Screenshots
 PageName | ScreenShots
 --- | ---
 Index | ![image](https://github.com/user-attachments/assets/8258824c-18a9-4df9-a711-39f35a6ae98b)
