@@ -3,6 +3,7 @@ version: '3.8'
 services:
   web:
     build: .
+    container_name: pulse-care-app
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
@@ -13,6 +14,7 @@ services:
 
   redis:
     image: redis:latest
+    container_name: pulse-care-redis
     ports:
       - "6379:6379"
     volumes:

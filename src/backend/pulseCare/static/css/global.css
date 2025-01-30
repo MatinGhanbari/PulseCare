@@ -10,8 +10,8 @@
     -ms-overflow-x: hidden;
     -ms-overflow-y: hidden;
     background-image: url("https://img.freepik.com/free-photo/cement-texture_1194-5360.jpg");
-    background-repeat: repeat;
-    background-size: contain;
+    background-repeat: no-repeat;
+    background-size: cover;
     background-position: center;
 }
 

@@ -13,10 +13,9 @@ body {
     border-spacing: 0;
     font-family: 'Inter', sans-serif;
     background-image: url("https://img.freepik.com/free-photo/cement-texture_1194-5360.jpg");
-    /*background-repeat: no-repeat;*/
-    /*background-size: cover;*/
-    /*background-position: center;*/
-    /*background-clip: unset;*/
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
 }
 
 *, ::after, ::before {
