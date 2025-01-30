@@ -1,8 +1,14 @@
-async function fetchECGData(data_path, frame = 0, frame_size = 200) {
+var chart = null;
+let patient = null;
+let frame = 0;
+let frame_size = 500;
+let sampto = frame_size * 2 < 1000 ? 1000 : frame_size * 2;
+
+async function fetchECGData(patient, frame = 0, frame_size = 200) {
     const start = frame * frame_size;
     const token = localStorage.getItem('token');
 
-    const response = await fetch(`http://127.0.0.1:8000/api/ecg?format=json&sampto=${sampto}&start=${start}&length=${frame_size}&data_path=${data_path}`, {
+    const response = await fetch(`http://127.0.0.1:8000/api/ecg?format=json&sampto=${sampto}&start=${start}&length=${frame_size}&patient=${patient}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -11,7 +17,7 @@ async function fetchECGData(data_path, frame = 0, frame_size = 200) {
         credentials: 'include'
     });
     if (!response.ok) {
-        // window.location.assign("../pages/login.html");
+        alert("Error on parsing the dataset");
         return;
     }
     return await response.json();
@@ -44,8 +50,12 @@ async function updateChartData(ecg) {
     console.log("Chart updated");
 }
 
-async function renderECG(data_path, frame = 0, frame_size = 200) {
-    const ecg = await fetchECGData(data_path, frame, frame_size);
+function renderCreatePatientMessage() {
+
+}
+
+async function renderECG(patient, frame = 0, frame_size = 200) {
+    const ecg = await fetchECGData(patient, frame, frame_size);
     const {ecg_data, peaks} = processECGData(ecg);
 
     const ctx = document.getElementById('ecgChart').getContext('2d');
@@ -55,29 +65,11 @@ async function renderECG(data_path, frame = 0, frame_size = 200) {
         data: {
             labels: Array.from({length: ecg_data.length}, (_, i) => i),
             datasets: [
-                {type: 'bubble', label: 'R Peak', data: peaks.ECG_R_Peaks, borderColor: 'rgb(220,8,8)', pointRadius: 8},
-                {type: 'bubble', label: 'T Peak', data: peaks.ECG_T_Peaks, borderColor: 'rgb(0,124,9)', pointRadius: 8},
-                {
-                    type: 'bubble',
-                    label: 'P Peak',
-                    data: peaks.ECG_P_Peaks,
-                    borderColor: 'rgb(255,99,132)',
-                    pointRadius: 8
-                },
-                {
-                    type: 'bubble',
-                    label: 'Q Peak',
-                    data: peaks.ECG_Q_Peaks,
-                    borderColor: 'rgb(173,185,0)',
-                    pointRadius: 8
-                },
-                {
-                    type: 'bubble',
-                    label: 'S Peak',
-                    data: peaks.ECG_S_Peaks,
-                    borderColor: 'rgb(185,56,0)',
-                    pointRadius: 8
-                },
+                {type: 'bubble', label: 'P Peak', data: peaks.ECG_P_Peaks, borderColor: '#1f77b4', pointRadius: 8},
+                {type: 'bubble', label: 'Q Peak', data: peaks.ECG_Q_Peaks, borderColor: '#ff7f0e', pointRadius: 8},
+                {type: 'bubble', label: 'R Peak', data: peaks.ECG_R_Peaks, borderColor: '#d62728', pointRadius: 8},
+                {type: 'bubble', label: 'S Peak', data: peaks.ECG_S_Peaks, borderColor: '#2ca02c', pointRadius: 8},
+                {type: 'bubble', label: 'T Peak', data: peaks.ECG_T_Peaks, borderColor: '#9467bd', pointRadius: 8},
                 {
                     type: 'line',
                     label: 'ECG Signal',
@@ -94,7 +86,7 @@ async function renderECG(data_path, frame = 0, frame_size = 200) {
         options: {
             responsive: true,
             scales: {
-                x: {title: {display: true, text: 'Time (ms)'}},
+                // x: {title: {display: true, text: 'Time (ms)'}},
                 y: {title: {display: true, text: 'Amplitude (mV)'}}
             },
             plugins: {
@@ -121,17 +113,15 @@ async function renderECG(data_path, frame = 0, frame_size = 200) {
     return chart;
 }
 
-async function changeData(dataset) {
-    const last_data = document.getElementById(data_path.replace("datasets/", ""));
+async function changeData(patient_id) {
+    const last_data = document.getElementById(`patient-${patient}`);
     last_data.classList.remove("dataset-active");
 
-    data_path = `datasets/${dataset}`;
-    frame = 0;
-
-    const ecg = await fetchECGData(data_path, frame, frame_size);
+    patient = patient_id;
+    const ecg = await fetchECGData(`${patient_id}`, 0, frame_size);
     await updateChartData(ecg);
 
-    const new_data = document.getElementById(dataset);
+    const new_data = document.getElementById(`patient-${patient_id}`);
     new_data.classList.add("dataset-active");
 }
 
@@ -140,7 +130,7 @@ async function prevFrame() {
     document.querySelector("#page-loader").style.display = "block";
     frame--;
     console.log(frame);
-    const ecg = await fetchECGData(data_path, frame, frame_size);
+    const ecg = await fetchECGData(patient, frame, frame_size);
     await updateChartData(ecg);
     document.querySelector("#page-loader").style.display = "none";
 }
@@ -149,7 +139,7 @@ async function nextFrame() {
     document.querySelector("#page-loader").style.display = "block";
     frame++;
     console.log(frame);
-    const ecg = await fetchECGData(data_path, frame, frame_size);
+    const ecg = await fetchECGData(patient, frame, frame_size);
     await updateChartData(ecg);
     document.querySelector("#page-loader").style.display = "none";
 }

@@ -1,5 +1,7 @@
 import datetime
 import json
+import os
+import shutil
 
 import jwt
 import neurokit2 as nk
@@ -8,16 +10,19 @@ import redis
 import wfdb
 from backend.settings import SECRET_KEY
 from django.contrib.auth import authenticate
+from django.core.files.storage import FileSystemStorage
+from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.authentication import BaseAuthentication
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import AuthenticationFailed, NotAuthenticated
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import User
+from .models import User, Patient
 
 # Initialize Redis connection
 redis_client = redis.StrictRedis(host='127.0.0.1', port=6379, db=0)
@@ -34,8 +39,19 @@ class JWTAuthentication(BaseAuthentication):
             raise AuthenticationFailed('Token has expired')
         except jwt.InvalidTokenError:
             raise AuthenticationFailed('Invalid token')
+
         user = User.objects.get(id=payload['user_id'])
         return (user, token)
+
+
+class APIViewWrapper(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def handle_exception(self, exc):
+        if isinstance(exc, AuthenticationFailed) or isinstance(exc, NotAuthenticated):
+            return redirect('login')
+        return super().handle_exception(exc)
 
 
 def index(request):
@@ -50,26 +66,107 @@ def signup(request):
     return render(request, 'pages/signup.html')
 
 
-class DashboardView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
+class DashboardView(APIViewWrapper):
     def get(self, request):
-        return render(request, 'pages/dashboard.html', {'user': request.user})
+        return render(request, 'pages/dashboard.html',
+                      {'user': request.user, 'all_patients_count': len(Patient.objects.all())})
 
 
-class PatientsView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
+class PatientsView(APIViewWrapper):
     def get(self, request):
         return render(request, 'pages/patients.html', {'user': request.user})
 
 
-class LogoutView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+class PatientCreateView(APIViewWrapper):
+    def get(self, request):
+        return render(request, 'pages/patients/create.html', {'user': request.user})
 
+    def post(self, request):
+        firstname = request.POST.get('firstname')
+        lastname = request.POST.get('lastname')
+        age = request.POST.get('age')
+        gender = request.POST.get('gender')
+        files = request.FILES.getlist('files')
+
+        patient = Patient(
+            first_name=firstname,
+            last_name=lastname,
+            age=age,
+            gender=gender,
+            doctor=request.user
+        )
+        patient.save()
+        directory_path = os.path.join('datasets', 'patients', str(patient.id))
+        os.makedirs(directory_path, exist_ok=True)
+
+        # Process each file
+        for file in files:
+            fs = FileSystemStorage(location=directory_path)
+            filename = fs.save(file.name, file)  # Save the file
+
+        # Return a JSON response
+        return Response({"message": "Files and data uploaded successfully!"})
+
+
+class PatientUpdateView(APIViewWrapper):
+    def get(self, request, pk):
+        patient = get_object_or_404(Patient, id=pk)
+        return render(request, 'pages/patients/edit.html', {'user': request.user, 'patient': patient})
+
+
+class PatientDetailView(APIViewWrapper):
+    def put(self, request, pk):
+        patient = get_object_or_404(Patient, pk=pk, doctor=request.user)
+
+        firstname = request.POST.get('firstname')
+        lastname = request.POST.get('lastname')
+        age = request.POST.get('age')
+        gender = request.POST.get('gender')
+        files = request.FILES.getlist('files')
+
+        patient.first_name = firstname
+        patient.last_name = lastname
+        patient.age = age
+        patient.gender = gender
+        patient.save()
+
+        directory_path = os.path.join('datasets', 'patients', str(patient.id))
+
+        prefix = f"ecg_data:{pk}"
+        remove_keys_with_prefix(prefix)
+        shutil.rmtree(directory_path)
+
+        os.makedirs(directory_path, exist_ok=False)
+
+        # Process each file
+        for file in files:
+            fs = FileSystemStorage(location=directory_path)
+            filename = fs.save(file.name, file)  # Save the file
+
+        # Return a JSON response
+        return Response({"message": "Updated successfully!"})
+
+    def delete(self, request, pk):
+        patient = get_object_or_404(Patient, pk=pk, doctor=request.user)
+        patient.delete()
+
+        prefix = f"ecg_data:{patient}"
+        remove_keys_with_prefix(prefix)
+
+        return Response({"message": "Deleted successfully!"})
+
+
+def remove_keys_with_prefix(prefix):
+    cursor = 0
+    while True:
+        cursor, keys = redis_client.scan(cursor, match=f"{prefix}*")
+        if keys:
+            redis_client.delete(*keys)
+        if cursor == 0:
+            break
+
+
+class LogoutView(APIViewWrapper):
     def post(self, request):
         return render(request, 'pages/patients.html', {'user': request.user})
 
@@ -104,36 +201,48 @@ class LoginView(APIView):
         return Response({'error': 'Invalid credentials'}, status=400)
 
 
-class ECGView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
+class ECGView(APIViewWrapper):
     def get(self, request):
         start = int(request.GET.get('start', 0))
         length = int(request.GET.get('length', 500))
         sampto = int(request.GET.get('sampto', 10_000))
-        data_path = str(request.GET.get('data_path', r'datasets/apnea-ecg/x01'))
+        patient = str(request.GET.get('patient'))
 
         # Generate a unique key based on request parameters
-        redis_key = f"ecg_data:{data_path}:{start}:{length}:{sampto}"
+        redis_key = f"ecg_data:{patient}:{start}:{length}:{sampto}"
 
         # Check if data exists in Redis
         cached_data = redis_client.get(redis_key)
         if cached_data:
             return Response(json.loads(cached_data))
 
+        directory_path = os.path.join('datasets', 'patients', str(patient))
+        files = [f for f in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, f))]
+        record_path = f"{os.path.join(directory_path, files[0].split(".")[0])}"
+
         try:
-            record = wfdb.rdrecord(data_path, sampto=sampto)
+            record = wfdb.rdrecord(record_path, sampto=sampto)
         except ValueError as e:
-            record = wfdb.rdrecord(data_path)
+            record = wfdb.rdrecord(record_path)
 
         # Delineate the ECG signal
-        ecg_signal = record.p_signal[0:sampto, 0]
-        _, rpeaks = nk.ecg_peaks(ecg_signal, sampling_rate=record.fs)
-        _, waves_peak = nk.ecg_delineate(ecg_signal, rpeaks, sampling_rate=record.fs, method="peak")
+        try:
+            ecg_signal = record.p_signal[0:sampto, 0]
+            _, rpeaks = nk.ecg_peaks(ecg_signal, sampling_rate=record.fs)
+            _, waves_peak = nk.ecg_delineate(ecg_signal, rpeaks, sampling_rate=record.fs, method="peak")
+        except ValueError as e:
+            ecg_signal = record.p_signal[:, 0]
+            _, rpeaks = nk.ecg_peaks(ecg_signal, sampling_rate=record.fs)
+            try:
+                _, waves_peak = nk.ecg_delineate(ecg_signal, rpeaks, sampling_rate=record.fs, method="peak")
+            except ValueError as e:
+                waves_peak = {'ECG_R_Peaks': [], 'ECG_T_Peaks': [], 'ECG_P_Peaks': [], 'ECG_Q_Peaks': [],
+                              'ECG_S_Peaks': []}
 
         ecg_data = record.p_signal.tolist()[start:start + length] if len(record.p_signal.tolist()[0]) == 2 else [
             [i, record.p_signal.tolist()[start + i][0]] for i in range(length)]
+
+        # ecg_data = record.p_signal.tolist()[start:start + length]
 
         waves_peak['ECG_R_Peaks'] = rpeaks['ECG_R_Peaks']
         response = generate_ecg_response(ecg_data, waves_peak, start, length)

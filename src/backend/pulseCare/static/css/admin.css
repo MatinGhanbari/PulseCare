@@ -1,28 +1,44 @@
-.container{
+.container {
     display: flex;
     flex-wrap: wrap;
     height: 100vh;
-
-
 }
-.menu{
+
+.dash-body {
+    position: absolute;
+    overflow-x: auto;
+    right: 0;
+    width: 79%;
+    height: 100vh;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+.menu {
+    position: fixed; /* Fixed position */
+    top: 0; /* Sticks to the top of the viewport */
+    left: 0; /* Aligns to the left */
+    width: 100%; /* Full width */
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    z-index: 1000; /* Ensures it stays above other content */
+
     border-right: 1.5px solid rgb(235, 235, 235);
     width: 21%;
     height: 100vh;
     box-shadow: 0 0px 0px 2px rgba(240, 240, 240, 0.3);
-}
-.dash-body{
-    width: 79%;
-    height: 100vh;
+    background-color: rgba(255, 255, 255, 0.5);
+
 }
 
-.menu-container{
+.menu-container {
     width: 100%;
     border-spacing: 0;
-    
+
 }
 
-.profile-title{
+.profile-title {
     font-weight: 500;
     color: #161c2d;
     font-size: 22px;
@@ -31,7 +47,7 @@
     padding-left: 8%;
 }
 
-.profile-subtitle{
+.profile-subtitle {
     font-weight: 300;
     color: #8492a6;
     font-size: 15px;
@@ -40,19 +56,19 @@
     padding-left: 8%;
 }
 
-.logout-btn{
+.logout-btn {
     margin-top: 30px;
     width: 85%;
 }
 
-.profile-container{
+.profile-container {
     border-bottom: 1.5px solid rgb(235, 235, 235);
     /*border-radius: 6px;*/
     padding-top: 18%;
     padding-bottom: 12%;
     /*box-shadow: 0 0 3px rgba(52,58,64,0.08);*/
     text-align: center;
-    
+
 }
 
 
@@ -92,43 +108,36 @@
 */
 
 
-
-
-
-
-
-
-
-
-.heading-main12{
+.heading-main12 {
     font-weight: 500;
     font-size: 25px;
 }
 
-.heading-sub12{
+.heading-sub12 {
     font-weight: 500;
     font-size: 20px;
     text-align: right;
 }
 
 
-.header-search{
+.header-search {
     display: flex;
     justify-content: center;
 
-    
+
 }
-.header-searchbar{
+
+.header-searchbar {
     width: 75%;
     background-color: rgba(255, 255, 255, 0.705);
     border: 0.5px solid rgba(190, 190, 190, 0.884);
-    
-    
+
+
 }
 
-.add-doc-form-container{
+.add-doc-form-container {
     padding: 25px;
     margin-top: 30px;
-    
+
 }
 

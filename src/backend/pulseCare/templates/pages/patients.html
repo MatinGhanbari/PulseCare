@@ -39,7 +39,7 @@
                     <table border="0" class="profile-container">
                         <tr>
                             <td width="30%" style="padding-left:20px">
-                                <img src="{% static 'images/user.png' %}" alt="" width="100%"
+                                <img src="{% static 'images/user1.jpg' %}" alt="" width="100%"
                                      style="border-radius:50%">
                             </td>
                             <td style="padding:0px;margin:0px;">
@@ -74,11 +74,15 @@
             </tr>
         </table>
     </div>
-    <div class="dash-body" style="margin-top: 15px">
+    <div class="dash-body">
         <table border="0" width="100%" style=" border-spacing: 0;margin:0;padding:0;">
             <tr>
                 <td colspan="1" class="nav-bar">
-                    <p style="font-size: 23px;padding-left:12px;font-weight: 600;margin-left:20px;"> Patients</p>
+                    <p style="font-size: 23px;padding-left:12px;font-weight: 600;margin-left:20px;">Patients
+                        <a href="{% url 'patient-create' %}">
+                            <button class="btn-add"></button>
+                        </a>
+                    </p>
                 </td>
                 <td width="25%"></td>
                 <td width="15%">
@@ -101,64 +105,39 @@
                                 <center>
                                     <table class="filter-container" style="border: none;" border="0">
                                         <tr>
-                                            <td style="width: 25%;">
-                                                <div class="dashboard-items dataset-active" id="apnea-ecg/x01"
-                                                     onclick="changeData('apnea-ecg/x01');"
-                                                     style="cursor:pointer;padding:20px;margin:auto;width:95%;display: flex;justify-content: space-between;">
-                                                    <div>
-                                                        <div class="h1-dashboard">
-                                                            x01
+                                            <div id="no-patient" style="margin-top: 10%; width: 100%; display: none">
+                                                There are no patients here.
+                                                <br>
+                                                Click on <a class="non-style-link" style="color: #0A76D8"
+                                                            href="{% url 'patient-create' %}">Create</a> to add a new
+                                                patient.
+                                            </div>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="4">
+                                                <div class="grid-container">
+                                                    {% for patient in user.patients.all %}
+                                                        <div class="dashboard-items  {% if forloop.counter0 == 0 %}dataset-active{% endif %}"
+                                                             id="patient-{{ patient.id }}"
+                                                             onclick="changeData({{ patient.id }});">
+                                                            <div>
+                                                                <div class="h1-dashboard">
+                                                                    {{ patient.first_name }}
+                                                                </div>
+                                                                <br>
+                                                                <div class="h3-dashboard">
+                                                                    {{ patient.last_name }}
+                                                                </div>
+                                                            </div>
+                                                            <div style="width: 30px">
+                                                                <a href="{% url 'patient-update' patient.id %}">
+                                                                    <button class="btn-edit"></button>
+                                                                </a>
+                                                                <button class="btn-delete"
+                                                                        onclick="deletePatient({{ patient.id }})"></button>
+                                                            </div>
                                                         </div>
-                                                        <br>
-                                                        <div class="h3-dashboard">
-                                                            apnea-ecg
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td style="width: 25%;">
-                                                <div class="dashboard-items" id="apnea-ecg/x02"
-                                                     onclick="changeData('apnea-ecg/x02');"
-                                                     style="cursor:pointer;padding:20px;margin:auto;width:95%;display: flex;justify-content: space-between;">
-                                                    <div>
-                                                        <div class="h1-dashboard">
-                                                            x02
-                                                        </div>
-                                                        <br>
-                                                        <div class="h3-dashboard">
-                                                            apnea-ecg
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td style="width: 25%;">
-                                                <div class="dashboard-items" id="apnea-ecg/x03"
-                                                     onclick="changeData('apnea-ecg/x03');"
-                                                     style="cursor:pointer;padding:20px;margin:auto;width:95%;display: flex;justify-content: space-between;">
-                                                    <div>
-                                                        <div class="h1-dashboard">
-                                                            x03
-                                                        </div>
-                                                        <br>
-                                                        <div class="h3-dashboard">
-                                                            apnea-ecg
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td style="width: 25%;">
-                                                <div class="dashboard-items" id="apnea-ecg/x05"
-                                                     onclick="changeData('apnea-ecg/x05');"
-                                                     style="cursor:pointer;padding:20px;margin:auto;width:95%;display: flex;justify-content: space-between;">
-                                                    <div>
-                                                        <div class="h1-dashboard">
-                                                            x05
-                                                        </div>
-                                                        <br>
-                                                        <div class="h3-dashboard">
-                                                            apnea-ecg
-                                                        </div>
-                                                    </div>
+                                                    {% endfor %}
                                                 </div>
                                             </td>
                                         </tr>
@@ -186,6 +165,33 @@
 </div>
 <script src="{% static 'js/index.js' %}"></script>
 <script>
+    function logoutUser() {
+        localStorage.removeItem('token');
+        document.cookie = `jwt_token=; path=/`;
+        window.open('{% url 'index' %}', '_self');
+    }
+
+    function deletePatient(patient_id) {
+        fetch(`/api/patients/${patient_id}/`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `${localStorage.getItem('token')}`
+            },
+        })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert(response.json());
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+    }
+</script>
+<script>
     function updateDateTime() {
         const now = new Date();
         const options = {
@@ -200,26 +206,28 @@
         document.getElementById('live-datetime').innerText = now.toLocaleString('en-US', options);
     }
 
-    function logoutUser() {
-        localStorage.removeItem('token');
-        document.cookie = `jwt_token=; path=/`;
-        window.open('{% url 'index' %}', '_self');
-    }
-
     setInterval(updateDateTime, 1000);
     updateDateTime();
+</script>
+<script>
+    {% if user.patients.all|length > 0 %}
+        {% with first_patient=user.patients.all|first %}
+            patient = {{ first_patient.id }};
+        {% endwith %}
+    {% else %}
+        document.getElementById('no-patient').style.display = 'block';
+        patient = null;
+    {% endif %}
 
-    let data_path = 'datasets/apnea-ecg/x01';
-    let frame = 0;
-    let frame_size = 400;
-    let sampto = frame_size * 2 < 1000 ? 1000 : frame_size * 2;
-
-    var chart = null;
-    renderECG(data_path, frame, frame_size).then(chartres => {
-        chart = chartres;
-        document.querySelector("#wave-loader").style.display = "none";
-        document.querySelector("#ecgChart").style.display = "block";
-    });
+    if (patient == null) {
+        renderCreatePatientMessage();
+    } else {
+        renderECG(patient, frame, frame_size).then(chartres => {
+            chart = chartres;
+            document.querySelector("#wave-loader").style.display = "none";
+            document.querySelector("#ecgChart").style.display = "block";
+        });
+    }
 </script>
 </body>
 </html>

@@ -36,7 +36,7 @@
                     <table border="0" class="profile-container">
                         <tr>
                             <td width="30%" style="padding-left:20px">
-                                <img src="{% static 'images/user.png' %}" alt="" width="100%" style="border-radius:50%">
+                                <img src="{% static 'images/user1.jpg' %}" alt="" width="100%" style="border-radius:50%">
                             </td>
                             <td style="padding:0px;margin:0px;">
                                 <p class="profile-title username-field">{{ user.username }}</p>
@@ -70,7 +70,7 @@
             </tr>
         </table>
     </div>
-    <div class="dash-body" style="margin-top: 15px">
+    <div class="dash-body" >
         <table border="0" width="100%" style=" border-spacing: 0;margin:0;padding:0;">
             <tr>
                 <td colspan="1" class="nav-bar">
@@ -96,13 +96,13 @@
                             <tr>
                                 <td>
                                     <h3>Welcome!</h3>
-                                    <h1 class="username-field">{{ user.username }}</h1>
+                                    <h1 class="username-field">{{ user.username | upper }}</h1>
                                     <p>Thanks for joining with us.<br>
                                         We are always trying to get you a complete service<br>
                                         <br>
                                     </p>
-                                    <a href="#" class="non-style-link">
-                                        <button class="btn-primary btn" style="width:30%">View My Appointments</button>
+                                    <a href="{% url 'patients' %}" class="non-style-link">
+                                        <button class="btn-primary btn" style="width:30%">View My Patients</button>
                                     </a>
                                     <br>
                                     <br>
@@ -131,11 +131,11 @@
                                                      style="padding:20px;margin:auto;width:95%;display: flex;justify-content: space-between;">
                                                     <div>
                                                         <div class="h1-dashboard">
-                                                            1
+                                                            {{ all_patients_count }}
                                                         </div>
                                                         <br>
                                                         <div class="h3-dashboard">
-                                                            All Doctors &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                            All Patients
                                                         </div>
                                                     </div>
                                                     <div class="btn-icon-back dashboard-icons"
@@ -148,11 +148,11 @@
                                                      style="padding:20px;margin:auto;width:95%;display: flex;justify-content: space-between;">
                                                     <div>
                                                         <div class="h1-dashboard">
-                                                            4
+                                                            {{ user.patients.all|length }}
                                                         </div>
                                                         <br>
                                                         <div class="h3-dashboard">
-                                                            All Patients &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                            Your Patients
                                                         </div>
                                                     </div>
                                                     <div class="btn-icon-back dashboard-icons"

@@ -1,5 +1,8 @@
 from rest_framework import serializers
-from .models import User, HeartRateData
+
+from .models import Patient
+from .models import User
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,7 +14,8 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         return user
 
-class HeartRateDataSerializer(serializers.ModelSerializer):
+
+class PatientSerializer(serializers.ModelSerializer):
     class Meta:
-        model = HeartRateData
-        fields = ['heart_rate', 'timestamp']
+        model = Patient
+        fields = ['id', 'first_name', 'last_name', 'age', 'gender', 'phone']
