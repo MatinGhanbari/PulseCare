@@ -15,10 +15,9 @@ class LoginRequiredMiddleware:
             reverse('signup'),
         ]
 
-        if not request.session.get('username'):
-            if request.path not in public_urls:
-                return HttpResponse('Unauthorized', status=401)
-                # return redirect('http://127.0.0.1:5500/src/frontend/pages/login.html')
+        # if not request.session.get('username'):
+        #     if request.path not in public_urls:
+        #         return HttpResponse('Unauthorized', status=401)
 
         response = self.get_response(request)
         return response

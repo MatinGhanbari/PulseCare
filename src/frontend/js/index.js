@@ -140,8 +140,7 @@ function updateDateTime() {
         second: '2-digit',
         hour12: true // Set to false for 24-hour format
     };
-    const formattedDateTime = now.toLocaleString('en-US', options);
-    document.getElementById('live-datetime').innerText = formattedDateTime;
+    document.getElementById('live-datetime').innerText = now.toLocaleString('en-US', options);
 }
 
 async function logoutUser(event) {
