@@ -20,7 +20,7 @@ async function fetchECGData(data_path, frame = 0, frame_size = 200) {
 function processECGData(ecg) {
     const start = frame * frame_size;
     const ecg_data = ecg.ecg_data;
-    const peaks = ['r_peaks', 't_peaks', 'p_peaks', 'q_peaks', 's_peaks'].reduce((acc, peak) => {
+    const peaks = ['ECG_R_Peaks', 'ECG_T_Peaks', 'ECG_P_Peaks', 'ECG_Q_Peaks', 'ECG_S_Peaks'].reduce((acc, peak) => {
         acc[peak] = ecg[peak].filter(x => x < start + ecg_data.length).map(x => [x, ecg_data[x][1]]);
         return acc;
     }, {});
@@ -55,11 +55,29 @@ async function renderECG(data_path, frame = 0, frame_size = 200) {
         data: {
             labels: Array.from({length: ecg_data.length}, (_, i) => i),
             datasets: [
-                {type: 'bubble', label: 'R Peak', data: peaks.r_peaks, borderColor: 'rgb(220,8,8)', pointRadius: 8},
-                {type: 'bubble', label: 'T Peak', data: peaks.t_peaks, borderColor: 'rgb(0,124,9)', pointRadius: 8},
-                {type: 'bubble', label: 'P Peak', data: peaks.p_peaks, borderColor: 'rgb(255,99,132)', pointRadius: 8},
-                {type: 'bubble', label: 'Q Peak', data: peaks.q_peaks, borderColor: 'rgb(173,185,0)', pointRadius: 8},
-                {type: 'bubble', label: 'S Peak', data: peaks.s_peaks, borderColor: 'rgb(185,56,0)', pointRadius: 8},
+                {type: 'bubble', label: 'R Peak', data: peaks.ECG_R_Peaks, borderColor: 'rgb(220,8,8)', pointRadius: 8},
+                {type: 'bubble', label: 'T Peak', data: peaks.ECG_T_Peaks, borderColor: 'rgb(0,124,9)', pointRadius: 8},
+                {
+                    type: 'bubble',
+                    label: 'P Peak',
+                    data: peaks.ECG_P_Peaks,
+                    borderColor: 'rgb(255,99,132)',
+                    pointRadius: 8
+                },
+                {
+                    type: 'bubble',
+                    label: 'Q Peak',
+                    data: peaks.ECG_Q_Peaks,
+                    borderColor: 'rgb(173,185,0)',
+                    pointRadius: 8
+                },
+                {
+                    type: 'bubble',
+                    label: 'S Peak',
+                    data: peaks.ECG_S_Peaks,
+                    borderColor: 'rgb(185,56,0)',
+                    pointRadius: 8
+                },
                 {
                     type: 'line',
                     label: 'ECG Signal',
@@ -98,6 +116,7 @@ async function renderECG(data_path, frame = 0, frame_size = 200) {
         }
     });
 
+    window.addEventListener('resize', () => chart.resize());
     console.log("chart rendered!")
     return chart;
 }

@@ -1,8 +1,12 @@
 import datetime
+import json
 
 import jwt
 import neurokit2 as nk
+import numpy as np
+import redis
 import wfdb
+from backend.settings import SECRET_KEY
 from django.contrib.auth import authenticate
 from django.shortcuts import render
 from rest_framework import status
@@ -13,8 +17,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from src.backend.backend.settings import SECRET_KEY
 from .models import User
+
+# Initialize Redis connection
+redis_client = redis.StrictRedis(host='127.0.0.1', port=6379, db=0)
 
 
 class JWTAuthentication(BaseAuthentication):
@@ -108,6 +114,14 @@ class ECGView(APIView):
         sampto = int(request.GET.get('sampto', 10_000))
         data_path = str(request.GET.get('data_path', r'datasets/apnea-ecg/x01'))
 
+        # Generate a unique key based on request parameters
+        redis_key = f"ecg_data:{data_path}:{start}:{length}:{sampto}"
+
+        # Check if data exists in Redis
+        cached_data = redis_client.get(redis_key)
+        if cached_data:
+            return Response(json.loads(cached_data))
+
         try:
             record = wfdb.rdrecord(data_path, sampto=sampto)
         except ValueError as e:
@@ -118,19 +132,40 @@ class ECGView(APIView):
         _, rpeaks = nk.ecg_peaks(ecg_signal, sampling_rate=record.fs)
         _, waves_peak = nk.ecg_delineate(ecg_signal, rpeaks, sampling_rate=record.fs, method="peak")
 
-        filtered_r_peaks = [num - start for num in rpeaks['ECG_R_Peaks'] if start < num < start + length]
-        filtered_t_peaks = [num - start for num in waves_peak['ECG_T_Peaks'] if start < num < start + length]
-        filtered_p_peaks = [num - start for num in waves_peak['ECG_P_Peaks'] if start < num < start + length]
-        filtered_q_peaks = [num - start for num in waves_peak['ECG_Q_Peaks'] if start < num < start + length]
-        filtered_s_peaks = [num - start for num in waves_peak['ECG_S_Peaks'] if start < num < start + length]
+        ecg_data = record.p_signal.tolist()[start:start + length] if len(record.p_signal.tolist()[0]) == 2 else [
+            [i, record.p_signal.tolist()[start + i][0]] for i in range(length)]
 
-        return Response({
-            'ecg_data': record.p_signal.tolist()[start:start + length]
-            if len(record.p_signal.tolist()[0]) == 2
-            else [[i, record.p_signal.tolist()[start + i][0]] for i in range(length)],
-            'r_peaks': filtered_r_peaks,
-            't_peaks': filtered_t_peaks,
-            'p_peaks': filtered_p_peaks,
-            'q_peaks': filtered_q_peaks,
-            's_peaks': filtered_s_peaks,
-        })
+        waves_peak['ECG_R_Peaks'] = rpeaks['ECG_R_Peaks']
+        response = generate_ecg_response(ecg_data, waves_peak, start, length)
+
+        # Store the response data in Redis
+        redis_client.set(redis_key, json.dumps(response, cls=NumpyEncoder))
+        return Response(response)
+
+
+def generate_ecg_response(ecg_data, peaks, start, length):
+    filtered_r_peaks = [num - start for num in peaks['ECG_R_Peaks'] if start < num < start + length]
+    filtered_t_peaks = [num - start for num in peaks['ECG_T_Peaks'] if start < num < start + length]
+    filtered_p_peaks = [num - start for num in peaks['ECG_P_Peaks'] if start < num < start + length]
+    filtered_q_peaks = [num - start for num in peaks['ECG_Q_Peaks'] if start < num < start + length]
+    filtered_s_peaks = [num - start for num in peaks['ECG_S_Peaks'] if start < num < start + length]
+
+    return {
+        'ecg_data': ecg_data,
+        'ECG_R_Peaks': filtered_r_peaks,
+        'ECG_T_Peaks': filtered_t_peaks,
+        'ECG_P_Peaks': filtered_p_peaks,
+        'ECG_Q_Peaks': filtered_q_peaks,
+        'ECG_S_Peaks': filtered_s_peaks,
+    }
+
+
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
