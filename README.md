@@ -1,4 +1,4 @@
-# PulseWave
+# PulseCare
 Web-based application designed to visualize heart pulse data through an interactive and user-friendly interface. 
 
 PageName | ScreenShots

@@ -1,8 +1,3 @@
-body{
-    border-spacing: 0;
-    margin: 0;
-    padding: 0
-}
 .container{
     display: flex;
     flex-wrap: wrap;
@@ -12,13 +7,13 @@ body{
 }
 .menu{
     border-right: 1.5px solid rgb(235, 235, 235);
-    width: 24%;
-    height: 100%;
+    width: 21%;
+    height: 100vh;
     box-shadow: 0 0px 0px 2px rgba(240, 240, 240, 0.3);
 }
 .dash-body{
-    width: 76%;
-    height: 100%;
+    width: 79%;
+    height: 100vh;
 }
 
 .menu-container{
@@ -46,27 +41,28 @@ body{
 }
 
 .logout-btn{
-    margin-top: 20px;
+    margin-top: 30px;
     width: 85%;
 }
 
 .profile-container{
-    border: 1.5px solid rgb(235, 235, 235);
-    border-radius: 6px;
-    padding-top: 12%;
+    border-bottom: 1.5px solid rgb(235, 235, 235);
+    /*border-radius: 6px;*/
+    padding-top: 18%;
     padding-bottom: 12%;
-    box-shadow: 0 0 3px rgba(52,58,64,0.08);
+    /*box-shadow: 0 0 3px rgba(52,58,64,0.08);*/
     text-align: center;
     
 }
 
 
-.menu-items1{
+/*.menu-items1{
     font-weight: 500;
     text-align: left;
     padding: 0;
     margin: 0;
     color: #161c2def;
+    
 }
 
 .menu-td1{
@@ -76,47 +72,45 @@ body{
 
 .menu-button:hover{
     cursor: pointer;
-    background-color:#396df01f;
+    background-color:var(--btnice);
 }
 
 .menu-active{
-    background-color:#27272710;
+    color:var(--btnnicetext);
+    
 }
 
-
-.header-container{
-    margin-top: 25px;
-    margin-bottom: 5%;
-    background-image: url(../assets/images/bg01.jpg);
-    
+.menu-items1-active{
+    color:var(--btnnicetext);
+    background-image: url('../images/search.svg');
+    background-position: 10px 50%;
     background-repeat: no-repeat;
-    background-size:cover;
-    height: 300px;
-    text-align: center;
-    border-radius: 10px;
-    box-shadow: 0 3px 5px 0 rgba(240, 240, 240, 0.3);
-    border-spacing: 0;
-    
 }
 
-.header-items{
-    background: rgba(26, 26, 26, 0.548);
-    border-radius: 10px;
-    border-spacing: 0;
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+.heading-main12{
+    font-weight: 500;
+    font-size: 25px;
 }
 
-#header-heading{
-    font-size: 30px;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.938);
+.heading-sub12{
+    font-weight: 500;
+    font-size: 20px;
+    text-align: right;
 }
 
-#header-sub-heading{
-    font-size: 17px;
-    font-weight: 400;
-    color: rgba(255, 255, 255, 0.5)
-    ;
-}
 
 .header-search{
     display: flex;
@@ -125,9 +119,16 @@ body{
     
 }
 .header-searchbar{
-    width: 40%;
+    width: 75%;
     background-color: rgba(255, 255, 255, 0.705);
     border: 0.5px solid rgba(190, 190, 190, 0.884);
     
     
 }
+
+.add-doc-form-container{
+    padding: 25px;
+    margin-top: 30px;
+    
+}
+

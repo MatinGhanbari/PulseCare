@@ -1,0 +1,198 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/animations.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+    <title>Dashboard</title>
+    <style>
+        .dashbord-tables, .doctor-heade {
+            animation: transitionIn-Y-over 0.5s;
+        }
+
+        .filter-container {
+            animation: transitionIn-Y-bottom 0.5s;
+        }
+
+        .sub-table, #anim {
+            animation: transitionIn-Y-bottom 0.5s;
+        }
+
+        .doctor-heade {
+            animation: transitionIn-Y-over 0.5s;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="menu">
+        <table class="menu-container" border="0">
+            <tr>
+                <td style="padding:10px" colspan="2">
+                    <table border="0" class="profile-container">
+                        <tr>
+                            <td width="30%" style="padding-left:20px">
+                                <img src="{% static 'images/user.png' %}" alt="" width="100%" style="border-radius:50%">
+                            </td>
+                            <td style="padding:0px;margin:0px;">
+                                <p class="profile-title username-field">{{ user.username }}</p>
+                                <p class="profile-subtitle">user</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <input type="button" value="Log out" onclick="logoutUser()"
+                                       class="logout-btn btn-primary-soft btn">
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr class="menu-row">
+                <td class="menu-btn menu-icon-dashbord menu-active menu-icon-dashbord-active">
+                    <a href="{% url 'dashboard' %}" class="non-style-link-menu non-style-link-menu-active">
+                        <div><p class="menu-text">Dashboard</p></div>
+                    </a>
+                </td>
+            </tr>
+            <tr class="menu-row">
+                <td class="menu-btn menu-icon-patient">
+                    <a href="{% url 'patients' %}" class="non-style-link-menu">
+                        <div>
+                            <p class="menu-text">Patients</p>
+                        </div>
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="dash-body" style="margin-top: 15px">
+        <table border="0" width="100%" style=" border-spacing: 0;margin:0;padding:0;">
+            <tr>
+                <td colspan="1" class="nav-bar">
+                    <p style="font-size: 23px;padding-left:12px;font-weight: 600;margin-left:20px;"> Dashboard</p>
+                </td>
+                <td width="25%"></td>
+                <td width="15%">
+                    <p style="font-size: 14px;color: rgb(119, 119, 119);padding: 0;margin: 0;text-align: right;">
+                        Today's Date and Time
+                    </p>
+                    <p class="heading-sub12" style="padding: 0;margin: 0;" id="live-datetime"></p>
+                </td>
+                <td width="10%">
+                    <button class="btn-label" style="display: flex;justify-content: center;align-items: center;">
+                        <img src="{% static 'images/calendar.svg' %}" width="100%">
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <center>
+                        <table class="filter-container doctor-header" style="border: none;width:95%" border="0">
+                            <tr>
+                                <td>
+                                    <h3>Welcome!</h3>
+                                    <h1 class="username-field">{{ user.username }}</h1>
+                                    <p>Thanks for joining with us.<br>
+                                        We are always trying to get you a complete service<br>
+                                        <br>
+                                    </p>
+                                    <a href="#" class="non-style-link">
+                                        <button class="btn-primary btn" style="width:30%">View My Appointments</button>
+                                    </a>
+                                    <br>
+                                    <br>
+                                </td>
+                            </tr>
+                        </table>
+                    </center>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <table border="0" width="100%">
+                        <tr>
+                            <td width="50%">
+                                <center>
+                                    <table class="filter-container" style="border: none;" border="0">
+                                        <tr>
+                                            <td colspan="4">
+                                                <p style="font-size: 20px;font-weight:600;padding-left: 12px;">
+                                                    Status</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 25%;cursor: pointer;" onclick="window.location.reload()">
+                                                <div class="dashboard-items"
+                                                     style="padding:20px;margin:auto;width:95%;display: flex;justify-content: space-between;">
+                                                    <div>
+                                                        <div class="h1-dashboard">
+                                                            1
+                                                        </div>
+                                                        <br>
+                                                        <div class="h3-dashboard">
+                                                            All Doctors &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                        </div>
+                                                    </div>
+                                                    <div class="btn-icon-back dashboard-icons"
+                                                         style="background-image: url('{% static 'images/icons/doctors-hover.svg' %}');"></div>
+                                                </div>
+                                            </td>
+                                            <td style="width: 25%;cursor: pointer"
+                                                onclick="window.location.assign('{% url 'patients' %}')">
+                                                <div class="dashboard-items"
+                                                     style="padding:20px;margin:auto;width:95%;display: flex;justify-content: space-between;">
+                                                    <div>
+                                                        <div class="h1-dashboard">
+                                                            4
+                                                        </div>
+                                                        <br>
+                                                        <div class="h3-dashboard">
+                                                            All Patients &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                        </div>
+                                                    </div>
+                                                    <div class="btn-icon-back dashboard-icons"
+                                                         style="background-image: url('{% static 'images/icons/patients-hover.svg' %}');"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </center>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+<script>
+    function updateDateTime() {
+        const now = new Date();
+        const options = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true // Set to false for 24-hour format
+        };
+        document.getElementById('live-datetime').innerText = now.toLocaleString('en-US', options);
+    }
+
+    function logoutUser() {
+        localStorage.removeItem('token');
+        document.cookie = `jwt_token=; path=/`;
+        window.open('{% url 'index' %}', '_self');
+    }
+
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+</script>
+</body>
+</html>

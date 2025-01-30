@@ -269,7 +269,7 @@ body{
 
 
 input[type=search] {
-    background-image: url('../assets/images/search.svg');
+    background-image: url('../images/search.svg');
     background-position: 10px 50%;
     background-repeat: no-repeat;
     transition: 0.5s;
@@ -370,31 +370,31 @@ input[type=search]:focus {
 
 
 .menu-icon-dashbord{
-  background-image: url('../assets/images/icons/dashboard.svg');
+  background-image: url('../images/icons/dashboard.svg');
 }
 
 
 .menu-icon-doctor{
-  background-image: url('../assets/images/icons/doctors.svg');
+  background-image: url('../images/icons/doctors.svg');
 }
 .menu-icon-schedule{
-  background-image: url('../assets/images/icons/schedule.svg');
+  background-image: url('../images/icons/schedule.svg');
 }
 .menu-icon-appoinment{
-  background-image: url('../assets/images/icons/book.svg');
+  background-image: url('../images/icons/book.svg');
 }
 .menu-icon-patient{
-  background-image: url('../assets/images/icons/patients.svg');
+  background-image: url('../images/icons/patients.svg');
 }
 .menu-icon-settings{
-  background-image: url('../assets/images/icons/settings.svg');
+  background-image: url('../images/icons/settings.svg');
 }
 
 .menu-icon-session{
-  background-image: url('../assets/images/icons/session.svg');
+  background-image: url('../images/icons/session.svg');
 }
 .menu-icon-home{
-  background-image: url('../assets/images/icons/home.svg');
+  background-image: url('../images/icons/home.svg');
 }
 
 
@@ -402,45 +402,45 @@ input[type=search]:focus {
 .menu-icon-dashbord:hover,.menu-icon-dashbord-active{
   color: var(--primarycolor);
 
-  background-image: url('../assets/images/icons/dashboard-hover.svg');
+  background-image: url('../images/icons/dashboard-hover.svg');
 }
 
 
 .menu-icon-doctor:hover,.menu-icon-doctor-active{
   color: var(--primarycolor);
-  background-image: url('../assets/images/icons/doctors-hover.svg');
+  background-image: url('../images/icons/doctors-hover.svg');
 }
 .menu-icon-schedule:hover,.menu-icon-schedule-active{
   color: var(--primarycolor);
   
-  background-image: url('../assets/images/icons/schedule-hover.svg');
+  background-image: url('../images/icons/schedule-hover.svg');
 }
 .menu-icon-appoinment:hover,.menu-icon-appoinment-active{
   color: var(--primarycolor);
   
-  background-image: url('../assets/images/icons/book-hover.svg');
+  background-image: url('../images/icons/book-hover.svg');
 }
 .menu-icon-patient:hover,.menu-icon-patient-active{
   color: var(--primarycolor);
   
-  background-image: url('../assets/images/icons/patients-hover.svg');
+  background-image: url('../images/icons/patients-hover.svg');
 }
 
 .menu-icon-settings:hover,.menu-icon-settings-active{
   color: var(--primarycolor);
   
-  background-image: url('../assets/images/icons/settings-iceblue.svg');
+  background-image: url('../images/icons/settings-iceblue.svg');
 }
 
 .menu-icon-session:hover,.menu-icon-session-active{
   color: var(--primarycolor);
   
-  background-image: url('../assets/images/icons/session-iceblue.svg');
+  background-image: url('../images/icons/session-iceblue.svg');
 }
 .menu-icon-home:hover,.menu-icon-home-active{
   color: var(--primarycolor);
   
-  background-image: url('../assets/images/icons/home-iceblue.svg');
+  background-image: url('../images/icons/home-iceblue.svg');
 }
 
 
@@ -448,7 +448,7 @@ input[type=search]:focus {
 
 
 .btn-icon-back{
-  background-image: url('../assets/images/icons/back-iceblue.svg');
+  background-image: url('../images/icons/back-iceblue.svg');
   background-position: 18px 50%;
   background-repeat: no-repeat;
   transition: 0.5s;
@@ -456,37 +456,37 @@ input[type=search]:focus {
 }
 
 .btn-icon-back:hover{
-  background-image: url('../assets/images/icons/back-white.svg');
+  background-image: url('../images/icons/back-white.svg');
 }
 
 
 .btn-edit{
-  background-image: url('../assets/images/icons/edit-iceblue.svg');
+  background-image: url('../images/icons/edit-iceblue.svg');
 }
 .btn-edit:hover{
-  background-image: url('../assets/images/icons/edit-white.svg');
+  background-image: url('../images/icons/edit-white.svg');
 }
 
 .btn-view{
-  background-image: url('../assets/images/icons/view-iceblue.svg');
+  background-image: url('../images/icons/view-iceblue.svg');
 }
 .btn-view:hover{
-  background-image: url('../assets/images/icons/view-white.svg');
+  background-image: url('../images/icons/view-white.svg');
 }
 
 .btn-delete{
-  background-image: url('../assets/images/icons/delete-iceblue.svg');
+  background-image: url('../images/icons/delete-iceblue.svg');
 }
 .btn-delete:hover{
-  background-image: url('../assets/images/icons/delete-white.svg');
+  background-image: url('../images/icons/delete-white.svg');
 }
 
 .btn-filter{
-  background-image: url('../assets/images/icons/filter-iceblue.svg');
+  background-image: url('../images/icons/filter-iceblue.svg');
   background-position: 15px 50%;
 }
 .btn-filter:hover{
-  background-image: url('../assets/images/icons/filter-white.svg');
+  background-image: url('../images/icons/filter-white.svg');
 }
 
 
@@ -544,7 +544,7 @@ input[type=search]:focus {
 
 
 .doctor-header{
-  background-image: url(../assets/images/b8.jpg);
+  background-image: url(../images/b8.jpg);
   color: rgba(0, 0, 0, 0.87);
   background-size: 100%;
   background-repeat: no-repeat;
@@ -553,7 +553,7 @@ input[type=search]:focus {
 }
 
 .patient-header{
-  background-image: url(../assets/images/b3.jpg);
+  background-image: url(../images/b3.jpg);
 }
 
 .search-items{
@@ -596,7 +596,7 @@ input[type=search]:focus {
 }
 
 .btn-book{
-  background-image: url('../assets/images/icons/book-balck.svg');
+  background-image: url('../images/icons/book-balck.svg');
   background-position: 68% 50%;
   background-repeat: no-repeat;
   transition: 0.5s;

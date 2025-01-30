@@ -1,11 +1,17 @@
 async function fetchECGData(data_path, frame = 0, frame_size = 200) {
     const start = frame * frame_size;
+    const token = localStorage.getItem('token');
+
     const response = await fetch(`http://127.0.0.1:8000/api/ecg?format=json&sampto=${sampto}&start=${start}&length=${frame_size}&data_path=${data_path}`, {
         method: 'GET',
-        credentials: "include"
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `${token}`
+        },
+        credentials: 'include'
     });
     if (!response.ok) {
-        window.location.assign("../pages/login.html");
+        // window.location.assign("../pages/login.html");
         return;
     }
     return await response.json();
@@ -127,84 +133,4 @@ async function nextFrame() {
     const ecg = await fetchECGData(data_path, frame, frame_size);
     await updateChartData(ecg);
     document.querySelector("#page-loader").style.display = "none";
-}
-
-function updateDateTime() {
-    const now = new Date();
-    const options = {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true // Set to false for 24-hour format
-    };
-    document.getElementById('live-datetime').innerText = now.toLocaleString('en-US', options);
-}
-
-async function logoutUser(event) {
-    const response = await fetch("http://127.0.0.1:8000/api/logout", {
-        method: 'GET',
-        credentials: "include"
-    });
-
-    if (response.ok) {
-        window.location.assign("../index.html");
-    } else {
-        window.location.assign("../pages/login.html");
-    }
-}
-
-async function getUser(event) {
-    const response = await fetch("http://127.0.0.1:8000/api/getme", {
-        method: 'GET',
-        credentials: "include"
-    });
-
-    if (response.ok) {
-        return response.json();
-    } else {
-        window.location.assign("../pages/login.html");
-    }
-}
-
-async function loginUser(event) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const response = await fetch("http://127.0.0.1:8000/api/login", {
-        method: 'POST',
-        body: JSON.stringify({
-            "username": formData.get("useremail"),
-            "password": formData.get("userpassword"),
-        }),
-        credentials: "include"
-    });
-
-    if (response.ok) {
-        window.location.href = './dashboard.html';  // Redirect on success
-    } else {
-        const errorText = await response.json();
-        alert(errorText.error);  // Show error message
-    }
-}
-
-async function registerUser(event) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const response = await fetch("http://127.0.0.1:8000/api/signup", {
-        method: 'POST',
-        body: JSON.stringify({
-            "username": formData.get("useremail"),
-            "password": formData.get("userpassword"),
-        }),
-        credentials: "include"
-    });
-
-    if (response.ok) {
-        window.location.href = './dashboard.html';  // Redirect on success
-    } else {
-        const errorText = await response.json();
-        alert(errorText.error);  // Show error message
-    }
 }

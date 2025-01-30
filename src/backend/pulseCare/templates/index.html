@@ -1,13 +1,14 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>PulseCare</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="./assets/images/pulse.png" type="image/png">
-    <link rel="stylesheet" href="./css/animations.css">
-    <link rel="stylesheet" href="./css/main.css">
-    <link rel="stylesheet" href="./css/index.css">
+    <link rel="icon" href="{% static 'images/pulse.png' %}" type="image/png">
+    <link rel="stylesheet" href="{% static 'css/animations.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
     <style>
         table {
             animation: transitionIn-Y-bottom 0.5s;
@@ -20,15 +21,15 @@
     <center>
         <table border="0">
             <tr>
-                <td width="80%"  style="margin-top:50px">
+                <td width="80%" style="margin-top:50px">
                     <font class="edoc-logo">PulseCare. </font>
                     <font class="edoc-logo-sub">| THE HEARTCARE PROJECT</font>
                 </td>
                 <td width="10%">
-                    <a href="./pages/login.html" class="non-style-link"><p class="nav-item">LOGIN</p></a>
+                    <a href="{% url 'login' %}" class="non-style-link"><p class="nav-item">LOGIN</p></a>
                 </td>
                 <td width="10%">
-                    <a href="./pages/signup.html" class="non-style-link"><p class="nav-item" style="padding-right: 10px;">
+                    <a href="{% url 'signup' %}" class="non-style-link"><p class="nav-item" style="padding-right: 10px;">
                         REGISTER</p></a>
                 </td>
             </tr>
@@ -36,7 +37,6 @@
             <tr>
                 <td colspan="3">
                     <p class="heading-text">Avoid Hassles & Delays.</p>
-
                 </td>
             </tr>
             <tr>
@@ -45,28 +45,23 @@
                 </td>
             </tr>
             <tr>
-
                 <td colspan="3">
                     <center>
-                        <a href="./pages/login.html">
+                        <a href="{% url 'login' %}">
                             <input type="button" value="Try PulseCare" class="login-btn btn-primary btn"
                                    style="padding-left: 25px;padding-right: 25px;padding-top: 10px;padding-bottom: 10px;">
                         </a>
                     </center>
                 </td>
-
             </tr>
             <tr>
-                <td colspan="3">
-
-                </td>
+                <td colspan="3"></td>
             </tr>
         </table>
         <footer>
             <p class="sub-text2 footer-hashen">Developed and Designed by MatinGhanbari</p>
         </footer>
     </center>
-
 </div>
 </body>
 </html>

@@ -1,20 +1,22 @@
-# Use the official Python image from the Docker Hub
-FROM python:3.9-slim
+# Stage 1: Build the application
+FROM python:3.9-slim as builder
 
-# Set the working directory in the container
 WORKDIR /app
-
-# Copy the requirements file into the container
 COPY requirements.txt .
+RUN pip install --upgrade pip
+RUN pip install --user -r requirements.txt
 
-# Install the required packages
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the rest of the application code into the container
 COPY . .
 
-# Expose the port the app runs on
-EXPOSE 5000
+# Stage 2: Create the final image
+FROM python:3.9-slim
 
-# Command to run the application
-CMD ["python", "app.py"]
+WORKDIR /app
+COPY --from=builder /root/.local /root/.local
+COPY --from=builder /app .
+
+ENV PATH=/root/.local/bin:$PATH
+
+WORKDIR src/backend
+# Run migrations on container startup
+CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
