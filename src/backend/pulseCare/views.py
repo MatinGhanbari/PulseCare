@@ -218,7 +218,7 @@ class ECGView(APIViewWrapper):
 
         directory_path = os.path.join('datasets', 'patients', str(patient))
         files = [f for f in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, f))]
-        record_path = f"{os.path.join(directory_path, files[0].split(".")[0])}"
+        record_path = str(os.path.join(directory_path, files[0].split(".")[0]))
 
         try:
             record = wfdb.rdrecord(record_path, sampto=sampto)
