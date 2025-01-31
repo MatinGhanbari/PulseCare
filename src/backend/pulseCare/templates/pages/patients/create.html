@@ -11,101 +11,92 @@
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
     <title>New Patient</title>
 </head>
-<body style="margin: 0; margin-bottom: 2%">
-<center>
-    <div class="container">
-        <table border="0" style="margin: 0;padding: 0;width: 60%;">
-            <form id="patient-form">
-                {% csrf_token %}
+<body>
+<div class="container">
+    <table border="0" style="margin: 0;padding: 0;width: 60%;">
+        <form id="patient-form">
+            {% csrf_token %}
+            <tr>
+                <td colspan="2">
+                    <p class="header-text">Patient Registration</p>
+                </td>
+            </tr>
+            <div class="form-body">
                 <tr>
-                    <td>
-                        <p class="header-text">New Patient</p>
+                    <td colspan="2">
+                        <p class="sub-text">Enter the patient information and then click on the submit button.</p>
                     </td>
                 </tr>
-                <div class="form-body">
-                    <tr>
-                        <td>
-                            <p class="sub-text">Complete the patient information</p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label-td">
-                            <label for="firstname" class="form-label">First Name: </label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label-td">
-                            <input type="text" id="firstname" class="input-text" placeholder="First Name" required>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label-td">
-                            <label for="lastname" class="form-label">Last Name: </label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label-td">
-                            <input type="text" id="lastname" class="input-text" placeholder="Last Name" required>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label-td">
-                            <label for="age" class="form-label">age: </label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label-td">
-                            <input type="text" id="age" class="input-text" placeholder="age" required>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label-td">
-                            <label for="gender" class="form-label">Gender: </label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label-td">
-                            <select id="gender" class="input-text" required>
-                                <option value="" disabled selected>Select gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label-td">
-                            <label for="files" class="form-label">Heart ECG data:</label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label-td">
-                            <input type="file" id="files" class="input-text" accept=".dat,.hea,.xyz" multiple required>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><br></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <button class="login-btn btn-primary btn">Create</button>
-                        </td>
-                    </tr>
-                </div>
                 <tr>
-                    <td>
-                        <br>
-                        <label class="sub-text" style="font-weight: 280;">Don't have an account&#63; </label>
-                        <a href="{% url 'signup' %}" class="hover-link1 non-style-link">Signup</a>
-                        <br><br><br>
-                        <a href="{% url 'patients' %}" class="hover-link1 non-style-link">Back</a>
-                        <br><br>
+                    <td class="label-td" colspan="2">
+                        <label for="firstname" class="form-label">First Name: </label>
                     </td>
                 </tr>
-            </form>
-        </table>
-    </div>
-</center>
+                <tr>
+                    <td class="label-td" colspan="2">
+                        <input type="text" id="firstname" class="input-text" placeholder="First Name" required>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label-td" colspan="2">
+                        <label for="lastname" class="form-label">Last Name: </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label-td" colspan="2">
+                        <input type="text" id="lastname" class="input-text" placeholder="Last Name" required>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label-td" width="50%">
+                        <label for="age" class="form-label">age: </label>
+                    </td>
+                    <td class="label-td" width="50%">
+                        <label for="gender" class="form-label">Gender: </label>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td class="label-td" width="50%">
+                        <input type="text" id="age" class="input-text" placeholder="age" required>
+                    </td>
+                    <td class="label-td" width="50%">
+                        <select id="gender" class="input-text" required>
+                            <option value="" disabled selected>Select gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label-td" colspan="2">
+                        <label for="files" class="form-label">Heart ECG data:</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label-td" colspan="2">
+                        <input type="file" id="files" class="input-text" accept=".dat,.hea,.xyz" multiple required>
+                    </td>
+                </tr>
+                <tr>
+                    <td><br></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button class="login-btn btn-primary btn">Create</button>
+                    </td>
+                </tr>
+            </div>
+            <tr>
+                <td colspan="2">
+                    <a href="{% url 'patients' %}" class="hover-link1 non-style-link">Back</a>
+                    <br><br>
+                </td>
+            </tr>
+        </form>
+    </table>
+</div>
 <script>
     document.getElementById('patient-form').addEventListener('submit', function (event) {
         event.preventDefault(); // Prevent the default form submission

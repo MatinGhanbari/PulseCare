@@ -12,63 +12,61 @@
     <title>Sign Up</title>
 </head>
 <body>
-<center>
-    <div class="container">
-        <table border="0" style="margin: 0;padding: 0;width: 60%;">
-            {% csrf_token %}
+<div class="container">
+    <table border="0" style="margin: 0;padding: 0;width: 60%;">
+        {% csrf_token %}
+        <tr>
+            <td>
+                <p class="header-text">Let's Get Started</p>
+            </td>
+        </tr>
+        <div class="form-body">
             <tr>
                 <td>
-                    <p class="header-text">Let's Get Started</p>
+                    <p class="sub-text">Add Your Personal Details to Continue</p>
                 </td>
             </tr>
-            <div class="form-body">
-                <tr>
-                    <td>
-                        <p class="sub-text">Add Your Personal Details to Continue</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="label-td">
-                        <label for="username" class="form-label">Username: </label>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="label-td">
-                        <input type="text" id="username" class="input-text" placeholder="Username" required>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="label-td">
-                        <label for="password" class="form-label">Password: </label>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="label-td">
-                        <input type="password" id="password" class="input-text" placeholder="Password" required>
-                    </td>
-                </tr>
-                <tr>
-                    <td><br></td>
-                </tr>
-                <tr>
-                    <td>
-                        <button onclick="registerUser()" class="login-btn btn-primary btn">Next</button>
-                    </td>
-                </tr>
-            </div>
+            <tr>
+                <td class="label-td">
+                    <label for="username" class="form-label">Username: </label>
+                </td>
+            </tr>
+            <tr>
+                <td class="label-td">
+                    <input type="text" id="username" class="input-text" placeholder="Username" required>
+                </td>
+            </tr>
+            <tr>
+                <td class="label-td">
+                    <label for="password" class="form-label">Password: </label>
+                </td>
+            </tr>
+            <tr>
+                <td class="label-td">
+                    <input type="password" id="password" class="input-text" placeholder="Password" required>
+                </td>
+            </tr>
+            <tr>
+                <td><br></td>
+            </tr>
             <tr>
                 <td>
-                    <br>
-                    <label class="sub-text" style="font-weight: 280;">Already have an account&#63; </label>
-                    <a href="{% url 'login' %}" class="hover-link1 non-style-link">Login</a>
-                    <br><br><br>
-                    <a href="{% url 'index' %}" class="hover-link1 non-style-link">Back to Home</a>
-                    <br><br>
+                    <button onclick="registerUser()" class="login-btn btn-primary btn">Next</button>
                 </td>
             </tr>
-        </table>
-    </div>
-</center>
+        </div>
+        <tr>
+            <td>
+                <br>
+                <label class="sub-text" style="font-weight: 280;">Already have an account&#63; </label>
+                <a href="{% url 'login' %}" class="hover-link1 non-style-link">Login</a>
+                <br><br><br>
+                <a href="{% url 'index' %}" class="hover-link1 non-style-link">Back to Home</a>
+                <br><br>
+            </td>
+        </tr>
+    </table>
+</div>
 <script>
     function registerUser() {
         const username = document.getElementById('username').value;

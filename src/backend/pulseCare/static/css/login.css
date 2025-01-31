@@ -1,11 +1,20 @@
 body {
-    margin: 7%;
+    height: 100dvh;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
     background-color: #F6F7FA;
 }
 
 .container {
-    width: 45%;
+    width: 35%;
+    min-width: 80dvh;
+    display: flex;
+    justify-content: center;
     background-color: white;
+    flex-wrap: wrap;
     border: 1px solid rgb(235, 235, 235);
     border-radius: 8px;
     margin: 0;
