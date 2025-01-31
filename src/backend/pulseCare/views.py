@@ -28,8 +28,8 @@ from .models import User, Patient
 # Initialize Redis connection
 redis_client = redis.StrictRedis(
     host=os.getenv('REDIS_HOST'),
-    port=int(os.getenv('REDIS_PORT')),
-    db=int(os.getenv('REDIS_DB'))
+    port=int(str(os.getenv('REDIS_PORT'))),
+    db=int(str(os.getenv('REDIS_DB')))
 )
 
 
