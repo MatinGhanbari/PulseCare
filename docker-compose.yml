@@ -5,6 +5,10 @@ services:
     build: .
     container_name: pulse-care-app
     command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      - REDIS_HOST=pulse-care-redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
     volumes:
       - .:/app
     ports:

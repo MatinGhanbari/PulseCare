@@ -25,7 +25,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User, Patient
 
 # Initialize Redis connection
-redis_client = redis.StrictRedis(host='pulse-care-redis', port=6379, db=0)
+redis_client = redis.StrictRedis(
+    host=os.getenv('REDIS_HOST'),
+    port=int(os.getenv('REDIS_PORT')),
+    db=int(os.getenv('REDIS_DB'))
+)
 
 
 class JWTAuthentication(BaseAuthentication):
