@@ -6,7 +6,10 @@ COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install --user -r requirements.txt
 
-COPY src src
+COPY src .
+
+COPY ./.env .
+COPY ./runtime.txt .
 
 # Stage 2: Create the final image
 FROM python:3.9-slim
