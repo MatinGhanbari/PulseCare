@@ -9,6 +9,11 @@ clone project and go to the project directory and execute this command:
 # Screenshots
 PageName | ScreenShots
 --- | ---
-Index | ![image](https://github.com/user-attachments/assets/8258824c-18a9-4df9-a711-39f35a6ae98b)
-Dashboard | ![image](https://github.com/user-attachments/assets/2314582a-97d7-4e6c-b1cc-248f761c2e4d)
-Patients | ![image](https://github.com/user-attachments/assets/10c1a846-63e2-4cf5-b51a-6226b4b7cedd)
+Index | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/index.png)
+Signup | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/signup.png)
+Login | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/login.png)
+Dashboard | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/dashboard.png)
+Patient 0 | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/patient-0.png)
+Patient 1 | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/patient-1.png)
+Add Patient | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/add-patient.png)
+Edit Patient | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/edit-patient.png)
