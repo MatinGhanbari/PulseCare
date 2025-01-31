@@ -14,6 +14,7 @@ from django.core.files.storage import FileSystemStorage
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
+from redis.exceptions import ConnectionError
 from rest_framework import status
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed, NotAuthenticated
@@ -161,13 +162,16 @@ class PatientDetailView(APIViewWrapper):
 
 
 def remove_keys_with_prefix(prefix):
-    cursor = 0
-    while True:
-        cursor, keys = redis_client.scan(cursor, match=f"{prefix}*")
-        if keys:
-            redis_client.delete(*keys)
-        if cursor == 0:
-            break
+    try:
+        cursor = 0
+        while True:
+            cursor, keys = redis_client.scan(cursor, match=f"{prefix}*")
+            if keys:
+                redis_client.delete(*keys)
+            if cursor == 0:
+                break
+    except ConnectionError as error:
+        print(f"Redis is unavailable! Message: {str(error)}")
 
 
 class LogoutView(APIViewWrapper):
@@ -216,9 +220,12 @@ class ECGView(APIViewWrapper):
         redis_key = f"ecg_data:{patient}:{start}:{length}:{sampto}"
 
         # Check if data exists in Redis
-        cached_data = redis_client.get(redis_key)
-        if cached_data:
-            return Response(json.loads(cached_data))
+        try:
+            cached_data = redis_client.get(redis_key)
+            if cached_data:
+                return Response(json.loads(cached_data))
+        except ConnectionError as error:
+            print(f"Redis is unavailable! Message: {str(error)}")
 
         directory_path = os.path.join('datasets', 'patients', str(patient))
         files = [f for f in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, f))]
@@ -252,7 +259,10 @@ class ECGView(APIViewWrapper):
         response = generate_ecg_response(ecg_data, waves_peak, start, length)
 
         # Store the response data in Redis
-        redis_client.set(redis_key, json.dumps(response, cls=NumpyEncoder))
+        try:
+            redis_client.set(redis_key, json.dumps(response, cls=NumpyEncoder))
+        except ConnectionError as error:
+            print(f"Redis is unavailable! Message: {str(error)}")
         return Response(response)
 
 
