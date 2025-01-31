@@ -2,19 +2,6 @@
 
 }
 
-.bg-image {
-    width: 100%;
-    height: 100%;
-    overflow-x: hidden;
-    overflow-y: hidden;
-    -ms-overflow-x: hidden;
-    -ms-overflow-y: hidden;
-    background-image: url("https://img.freepik.com/free-photo/cement-texture_1194-5360.jpg");
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-}
-
 .container {
 }
 
@@ -81,11 +68,11 @@ canvas {
     }
 }
 
-table{
+table {
     animation: transitionIn-Y-bottom 0.5s;
 }
 
-.dataset-active{
+.dataset-active {
     color: var(--primarycolor);
     border-right: 7px solid var(--primarycolor);
     background-color: rgba(185, 223, 255, 0.25);

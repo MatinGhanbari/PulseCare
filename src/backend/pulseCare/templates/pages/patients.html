@@ -5,13 +5,14 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://flowbite.com/docs/flowbite.min.js"></script>
+    <link rel="icon" href="{% static 'favicon.ico' %}">
+    <title>Patients</title>
     <link rel="stylesheet" href="{% static 'css/animations.css' %}">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     <link rel="stylesheet" href="{% static 'css/global.css' %}">
     <link rel="stylesheet" href="{% static 'css/admin.css' %}">
-    <title>Patients</title>
+    <script src="{% static 'js/flowbite.min.js' %}"></script>
+    <script src="{% static 'js/chart.js' %}"></script>
     <style>
         .dashbord-tables, .doctor-heade {
             animation: transitionIn-Y-over 0.5s;
@@ -192,24 +193,6 @@
     }
 </script>
 <script>
-    function updateDateTime() {
-        const now = new Date();
-        const options = {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true // Set to false for 24-hour format
-        };
-        document.getElementById('live-datetime').innerText = now.toLocaleString('en-US', options);
-    }
-
-    setInterval(updateDateTime, 1000);
-    updateDateTime();
-</script>
-<script>
     {% if user.patients.all|length > 0 %}
         {% with first_patient=user.patients.all|first %}
             patient = {{ first_patient.id }};
@@ -229,5 +212,6 @@
         });
     }
 </script>
+<script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>

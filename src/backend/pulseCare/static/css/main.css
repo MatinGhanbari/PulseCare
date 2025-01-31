@@ -12,7 +12,7 @@ body {
     padding: 0;
     border-spacing: 0;
     font-family: 'Inter', sans-serif;
-    background-image: url("https://img.freepik.com/free-photo/cement-texture_1194-5360.jpg");
+    background-image: url("../images/b368cd31d58ac02f3f8938bc56f63611.jpg");
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
@@ -543,6 +543,12 @@ input[type=search]:focus {
     background-image: url('../images/icons/filter-white.svg');
 }
 
+.full-height {
+    background: rgba(0, 0, 0, 0.15);
+    background-attachment: fixed;
+    max-height: 100vh;
+    height: 100vh;
+}
 
 .dashboard-items {
     /* Optional: Add styles for the items */
