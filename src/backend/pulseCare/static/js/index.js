@@ -30,8 +30,8 @@ async function fetchECGData(patient, frame = 0, frame_size = 200) {
 function processECGData(ecg) {
     const start = frame * frame_size;
     const ecg_data = ecg.ecg_data;
-    const peaks = ['ECG_R_Peaks', 'ECG_T_Peaks', 'ECG_P_Peaks', 'ECG_Q_Peaks', 'ECG_S_Peaks'].reduce((acc, peak) => {
-        acc[peak] = ecg[peak].filter(x => x < start + ecg_data.length).map(x => [x, ecg_data[x][1]]);
+    const peaks = ['ECG_P_Peaks', 'ECG_Q_Peaks', 'ECG_R_Peaks', 'ECG_S_Peaks', 'ECG_T_Peaks'].reduce((acc, peak) => {
+        acc[peak] = ecg[peak].filter(x => x < start + ecg_data.length).map(x => [x, ecg_data[x]]);
         return acc;
     }, {});
     return {ecg_data, peaks};
@@ -48,6 +48,7 @@ async function updateChartData(ecg) {
         } else { // For ECG signal dataset
             dataset.data = ecg_data;
         }
+        console.log(dataset.data);
     });
 
     chart.update();
@@ -76,7 +77,7 @@ async function renderECG(patient, frame = 0, frame_size = 200) {
                 {type: 'bubble', label: 'T Peak', data: peaks.ECG_T_Peaks, borderColor: '#9467bd', pointRadius: 8},
                 {
                     type: 'line',
-                    label: 'ECG Signal',
+                    label: 'ECG',
                     data: ecg_data,
                     borderColor: 'rgb(75, 192, 192)',
                     backgroundColor: 'rgba(100,100,100,0.27)',

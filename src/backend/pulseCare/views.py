@@ -2,6 +2,7 @@ import datetime
 import json
 import os
 import shutil
+from threading import Thread
 
 import jwt
 import neurokit2 as nk
@@ -109,6 +110,8 @@ class PatientCreateView(APIViewWrapper):
             fs = FileSystemStorage(location=directory_path)
             filename = fs.save(file.name, file)  # Save the file
 
+        Thread(target=analyse_patient_data, args=(patient.id,)).start()
+
         # Return a JSON response
         return Response({"message": "Files and data uploaded successfully!"})
 
@@ -147,6 +150,8 @@ class PatientDetailView(APIViewWrapper):
         for file in files:
             fs = FileSystemStorage(location=directory_path)
             filename = fs.save(file.name, file)  # Save the file
+
+        Thread(target=analyse_patient_data, args=(patient.id,)).start()
 
         # Return a JSON response
         return Response({"message": "Updated successfully!"})
@@ -250,11 +255,7 @@ class ECGView(APIViewWrapper):
                 waves_peak = {'ECG_R_Peaks': [], 'ECG_T_Peaks': [], 'ECG_P_Peaks': [], 'ECG_Q_Peaks': [],
                               'ECG_S_Peaks': []}
 
-        ecg_data = record.p_signal.tolist()[start:start + length] if len(record.p_signal.tolist()[0]) == 2 else [
-            [i, record.p_signal.tolist()[start + i][0]] for i in range(length)]
-        # ecg_data = [[i, record.p_signal.tolist()[start + i][1]] for i in range(length)] if len(record.p_signal.tolist()[0]) == 2 else [[i, record.p_signal.tolist()[start + i][0]] for i in range(length)]
-
-        # ecg_data = record.p_signal.tolist()[start:start + length]
+        ecg_data = ecg_signal.tolist()[start:start + length]
 
         waves_peak['ECG_R_Peaks'] = rpeaks['ECG_R_Peaks']
         response = generate_ecg_response(ecg_data, waves_peak, start, length)
@@ -268,19 +269,19 @@ class ECGView(APIViewWrapper):
 
 
 def generate_ecg_response(ecg_data, peaks, start, length):
-    filtered_r_peaks = [num - start for num in peaks['ECG_R_Peaks'] if start < num < start + length]
-    filtered_t_peaks = [num - start for num in peaks['ECG_T_Peaks'] if start < num < start + length]
     filtered_p_peaks = [num - start for num in peaks['ECG_P_Peaks'] if start < num < start + length]
     filtered_q_peaks = [num - start for num in peaks['ECG_Q_Peaks'] if start < num < start + length]
+    filtered_r_peaks = [num - start for num in peaks['ECG_R_Peaks'] if start < num < start + length]
     filtered_s_peaks = [num - start for num in peaks['ECG_S_Peaks'] if start < num < start + length]
+    filtered_t_peaks = [num - start for num in peaks['ECG_T_Peaks'] if start < num < start + length]
 
     return {
         'ecg_data': ecg_data,
-        'ECG_R_Peaks': filtered_r_peaks,
-        'ECG_T_Peaks': filtered_t_peaks,
         'ECG_P_Peaks': filtered_p_peaks,
         'ECG_Q_Peaks': filtered_q_peaks,
+        'ECG_R_Peaks': filtered_r_peaks,
         'ECG_S_Peaks': filtered_s_peaks,
+        'ECG_T_Peaks': filtered_t_peaks,
     }
 
 
@@ -293,3 +294,37 @@ class NumpyEncoder(json.JSONEncoder):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         return json.JSONEncoder.default(self, obj)
+
+
+def analyse_patient_data(patient_id):
+    try:
+        pass
+        # length = 5000
+        # print(f"Start analysing patient #{patient_id} pulse details")
+        # redis_key = f"ecg_data:{patient_id}"
+        #
+        # directory_path = os.path.join('datasets', 'patients', str(patient_id))
+        # files = [f for f in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, f))]
+        # record_path = str(os.path.join(directory_path, files[0].split(".")[0]))
+        #
+        # record = wfdb.rdrecord(record_path)
+        #
+        # ecg_signal = record.p_signal[:, 0]
+        # _, rpeaks = nk.ecg_peaks(ecg_signal, sampling_rate=record.fs)
+        # _, waves_peak = nk.ecg_delineate(ecg_signal, rpeaks, sampling_rate=record.fs, method="peak")
+        #
+        # # ecg_data = record.p_signal.tolist()[0:length] if len(
+        # #     record.p_signal.tolist()[0]) == 2 else [
+        # #     [i, record.p_signal.tolist()[i][0]] for i in range(length)]
+        # ecg_data = record.p_signal.tolist()[0:length]
+        #
+        # waves_peak['ECG_R_Peaks'] = rpeaks['ECG_R_Peaks']
+        #
+        # response = generate_ecg_response(ecg_data, waves_peak, 0, length)
+        #
+        # redis_client.set(redis_key, json.dumps(response, cls=NumpyEncoder))
+        # print(f"Patient #{patient_id} pulse details analysing done!")
+    except ConnectionError as error:
+        print(f"Redis is unavailable! Message: {str(error)}")
+    except:
+        raise
