@@ -48,7 +48,6 @@ async function updateChartData(ecg) {
         } else { // For ECG signal dataset
             dataset.data = ecg_data;
         }
-        console.log(dataset.data);
     });
 
     chart.update();
