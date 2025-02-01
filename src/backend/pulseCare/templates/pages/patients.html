@@ -142,6 +142,22 @@
                                                 </div>
                                             </td>
                                         </tr>
+                                        <tr>
+                                            <td>
+                                                <br>
+                                                <label for="length">Pulse Length</label>
+                                                <input type="range" id="length" min="500" max="5000" value="1000"
+                                                       step="1" list="values">
+                                                <datalist id="values">
+                                                    <option value="500" label="500"></option>
+                                                    <option value="1000" label="1000"></option>
+                                                    <option value="2000" label="2000"></option>
+                                                    <option value="3000" label="3000"></option>
+                                                    <option value="4000" label="4000"></option>
+                                                    <option value="5000" label="5000"></option>
+                                                </datalist>
+                                            </td>
+                                        </tr>
                                     </table>
                                     <div class="py-6">
                                         <div id="wave-loader">
@@ -193,6 +209,22 @@
     }
 </script>
 <script>
+    function startRender() {
+        frame_size = document.getElementById('length').value;
+        renderECG(patient, frame, frame_size).then(chartres => {
+            chart = chartres;
+            document.querySelector("#wave-loader").style.display = "none";
+            document.querySelector("#ecgChart").style.display = "block";
+        });
+    }
+
+    document.getElementById('length').addEventListener('change', () => {
+        frame_size = document.getElementById('length').value;
+        let ecg = fetchECGData(patient, frame, frame_size).then(response => {
+            updateChartData(response);
+        });
+    });
+
     {% if user.patients.all|length > 0 %}
         {% with first_patient=user.patients.all|first %}
             patient = {{ first_patient.id }};
@@ -205,11 +237,7 @@
     if (patient == null) {
         renderCreatePatientMessage();
     } else {
-        renderECG(patient, frame, frame_size).then(chartres => {
-            chart = chartres;
-            document.querySelector("#wave-loader").style.display = "none";
-            document.querySelector("#ecgChart").style.display = "block";
-        });
+        startRender();
     }
 </script>
 <script src="{% static 'js/main.js' %}"></script>

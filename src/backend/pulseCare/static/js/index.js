@@ -2,13 +2,17 @@ var chart = null;
 let patient = null;
 let frame = 0;
 let frame_size = 500;
-let sampto = frame_size * 2 < 1000 ? 1000 : frame_size * 2;
+let base_frame_size = 500;
+
+function calcSampto() {
+    return ++frame_size * 2 < 1000 ? 1000 : ++frame_size + 500
+}
 
 async function fetchECGData(patient, frame = 0, frame_size = 200) {
     const start = frame * frame_size;
     const token = localStorage.getItem('token');
 
-    const response = await fetch(`http://127.0.0.1:8000/api/ecg?format=json&sampto=${sampto}&start=${start}&length=${frame_size}&patient=${patient}`, {
+    const response = await fetch(`http://127.0.0.1:8000/api/ecg?format=json&sampto=${calcSampto()}&start=${start}&length=${frame_size}&patient=${patient}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -118,6 +122,8 @@ async function changeData(patient_id) {
     last_data.classList.remove("dataset-active");
 
     patient = patient_id;
+    frame_size = base_frame_size;
+    document.getElementById('length').value = frame_size;
     const ecg = await fetchECGData(`${patient_id}`, 0, frame_size);
     await updateChartData(ecg);
 

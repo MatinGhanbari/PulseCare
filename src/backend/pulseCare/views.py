@@ -250,9 +250,9 @@ class ECGView(APIViewWrapper):
                 waves_peak = {'ECG_R_Peaks': [], 'ECG_T_Peaks': [], 'ECG_P_Peaks': [], 'ECG_Q_Peaks': [],
                               'ECG_S_Peaks': []}
 
-        # ecg_data = record.p_signal.tolist()[start:start + length] if len(record.p_signal.tolist()[0]) == 2 else [
-        #     [i, record.p_signal.tolist()[start + i][0]] for i in range(length)]
-        ecg_data = [[i, record.p_signal.tolist()[start + i][1]] for i in range(length)] if len(record.p_signal.tolist()[0]) == 2 else [[i, record.p_signal.tolist()[start + i][0]] for i in range(length)]
+        ecg_data = record.p_signal.tolist()[start:start + length] if len(record.p_signal.tolist()[0]) == 2 else [
+            [i, record.p_signal.tolist()[start + i][0]] for i in range(length)]
+        # ecg_data = [[i, record.p_signal.tolist()[start + i][1]] for i in range(length)] if len(record.p_signal.tolist()[0]) == 2 else [[i, record.p_signal.tolist()[start + i][0]] for i in range(length)]
 
         # ecg_data = record.p_signal.tolist()[start:start + length]
 
