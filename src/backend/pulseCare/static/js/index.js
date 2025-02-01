@@ -1,11 +1,11 @@
 var chart = null;
 let patient = null;
 let frame = 0;
-let frame_size = 500;
-let base_frame_size = 500;
+let frame_size = 1000;
+let base_frame_size = 1000;
 
 function calcSampto() {
-    return ++frame_size * 2 < 1000 ? 1000 : ++frame_size + 500
+    return ((2 * (++frame_size)) < 1000) ? 1000 : (500 + (++frame_size))
 }
 
 async function fetchECGData(patient, frame = 0, frame_size = 200) {
@@ -83,7 +83,7 @@ async function renderECG(patient, frame = 0, frame_size = 200) {
                     tension: 0.2,
                     pointStyle: 'circle',
                     pointRadius: 0.2,
-                    fill: true
+                    fill: false
                 },
             ],
         },

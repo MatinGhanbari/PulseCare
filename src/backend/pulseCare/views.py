@@ -298,33 +298,44 @@ class NumpyEncoder(json.JSONEncoder):
 
 def analyse_patient_data(patient_id):
     try:
-        pass
-        # length = 5000
-        # print(f"Start analysing patient #{patient_id} pulse details")
-        # redis_key = f"ecg_data:{patient_id}"
-        #
-        # directory_path = os.path.join('datasets', 'patients', str(patient_id))
-        # files = [f for f in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, f))]
-        # record_path = str(os.path.join(directory_path, files[0].split(".")[0]))
-        #
-        # record = wfdb.rdrecord(record_path)
-        #
-        # ecg_signal = record.p_signal[:, 0]
-        # _, rpeaks = nk.ecg_peaks(ecg_signal, sampling_rate=record.fs)
-        # _, waves_peak = nk.ecg_delineate(ecg_signal, rpeaks, sampling_rate=record.fs, method="peak")
-        #
-        # # ecg_data = record.p_signal.tolist()[0:length] if len(
-        # #     record.p_signal.tolist()[0]) == 2 else [
-        # #     [i, record.p_signal.tolist()[i][0]] for i in range(length)]
-        # ecg_data = record.p_signal.tolist()[0:length]
-        #
-        # waves_peak['ECG_R_Peaks'] = rpeaks['ECG_R_Peaks']
-        #
-        # response = generate_ecg_response(ecg_data, waves_peak, 0, length)
-        #
-        # redis_client.set(redis_key, json.dumps(response, cls=NumpyEncoder))
-        # print(f"Patient #{patient_id} pulse details analysing done!")
+        print(f"Start patient {patient_id} details process.")
+        start = 0
+        length = 1000
+        sampto = 1502
+        patient = patient_id
+
+        # Generate a unique key based on request parameters
+        redis_key = f"ecg_data:{patient}:{start}:{length}:{sampto}"
+
+        directory_path = os.path.join('datasets', 'patients', str(patient))
+        files = [f for f in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, f))]
+        record_path = str(os.path.join(directory_path, files[0].split(".")[0]))
+
+        try:
+            record = wfdb.rdrecord(record_path, sampto=sampto)
+        except ValueError as e:
+            record = wfdb.rdrecord(record_path)
+
+        # Delineate the ECG signal
+        try:
+            ecg_signal = record.p_signal[0:sampto, 0]
+            _, rpeaks = nk.ecg_peaks(ecg_signal, sampling_rate=record.fs)
+            _, waves_peak = nk.ecg_delineate(ecg_signal, rpeaks, sampling_rate=record.fs, method="peak")
+        except ValueError as e:
+            ecg_signal = record.p_signal[:, 0]
+            _, rpeaks = nk.ecg_peaks(ecg_signal, sampling_rate=record.fs)
+            try:
+                _, waves_peak = nk.ecg_delineate(ecg_signal, rpeaks, sampling_rate=record.fs, method="peak")
+            except ValueError as e:
+                waves_peak = {'ECG_R_Peaks': [], 'ECG_T_Peaks': [], 'ECG_P_Peaks': [], 'ECG_Q_Peaks': [],
+                              'ECG_S_Peaks': []}
+
+        ecg_data = ecg_signal.tolist()[start:start + length]
+        waves_peak['ECG_R_Peaks'] = rpeaks['ECG_R_Peaks']
+        response = generate_ecg_response(ecg_data, waves_peak, start, length)
+
+        # Store the response data in Redis
+        redis_client.set(redis_key, json.dumps(response, cls=NumpyEncoder))
+        print(f"Patient {patient_id} pulse details done.")
     except ConnectionError as error:
         print(f"Redis is unavailable! Message: {str(error)}")
-    except:
-        raise
