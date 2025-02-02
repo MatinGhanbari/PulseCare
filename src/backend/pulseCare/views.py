@@ -65,11 +65,11 @@ def index(request):
 
 
 def login(request):
-    return render(request, 'pages/login.html')
+    return render(request, 'pages/account/login.html')
 
 
 def signup(request):
-    return render(request, 'pages/signup.html')
+    return render(request, 'pages/account/signup.html')
 
 
 class DashboardView(APIViewWrapper):
@@ -203,6 +203,10 @@ class LoginView(APIView):
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
+
+        if not username or not password:
+            return Response({'error': 'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
+
         user = authenticate(username=username, password=password)
         if user:
             User.objects.update_last_login(user, datetime.datetime.now())

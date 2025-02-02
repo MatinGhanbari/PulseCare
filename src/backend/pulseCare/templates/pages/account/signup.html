@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Student Dashboard</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{% static 'favicon.ico' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/account/signup.css' %}">
+</head>
+<body>
+<div class="signup-container">
+    <form action="">
+        <h2>Let's Get Started</h2>
+        <p class="text-muted">Add Your Personal Details to Continue.</p>
+        <div class="box">
+            <p class="text-muted">Username</p>
+            <input type="text" id="username">
+        </div>
+        <div class="box">
+            <p class="text-muted">Password</p>
+            <input type="password" id="password">
+        </div>
+        <div class="box">
+            <p class="text-muted">Confirm Password</p>
+            <input type="password" id="confirmpass">
+        </div>
+        <div class="box">
+            <p id="error" class="text-muted error-text" style="display: none"></p>
+        </div>
+        <div class="button">
+            <input type="submit" value="Signup" class="btn">
+            <a class="text-muted pointer-cursor" onclick="clearForm()">Clear</a>
+        </div>
+        <div>
+            <p>
+                Already have an account&#63; <a href="{% url 'login' %}">Login</a>
+            </p>
+            <br>
+        </div>
+        <a href="{% url 'index' %}"><p>Back To Home</p></a>
+    </form>
+</div>
+<script src="{% static 'js/account/signup.js' %}"></script>
+</body>
+</html>

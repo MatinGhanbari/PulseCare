@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Login</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{% static 'favicon.ico' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/account/login.css' %}">
+</head>
+<body>
+<div class="login-container">
+    <form action="">
+        <h2>Welcome Back!</h2>
+        <p class="text-muted">Login with your account to continue.</p>
+        <div class="box">
+            <p class="text-muted">Username</p>
+            <input type="text" id="username">
+        </div>
+        <div class="box">
+            <p class="text-muted">Password</p>
+            <input type="password" id="password">
+        </div>
+        <div class="box">
+            <p id="error" class="text-muted error-text" style="display: none"></p>
+        </div>
+        <div class="button">
+            <input type="submit" value="Login" class="btn">
+            <a class="text-muted pointer-cursor" onclick="clearForm()">Clear</a>
+        </div>
+        <div>
+            <p>
+                Don't have an account&#63; <a href="{% url 'signup' %}">Signup</a>
+            </p>
+            <br>
+        </div>
+        <a href="{% url 'index' %}"><p>Back To Home</p></a>
+    </form>
+</div>
+<script src="{% static 'js/account/login.js' %}"></script>
+</body>
+</html>
