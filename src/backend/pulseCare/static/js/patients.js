@@ -4,6 +4,66 @@ let frame = 0;
 let frame_size = 1000;
 let base_frame_size = 1000;
 
+const sideMenu = document.querySelector("aside");
+const themeToggler = document.querySelector(".theme-toggler");
+const datetime = document.getElementById("datetime");
+const patientName = document.getElementById("patient-name");
+
+function updateDateTime() {
+    const now = new Date();
+    const options = {
+        // year: 'numeric',
+        // month: 'long',
+        // day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+    };
+    datetime.innerHTML = now.toLocaleString('en-US', options);
+}
+
+window.onscroll = () => {
+    sideMenu.classList.remove('active');
+    if (window.scrollY > 0) {
+        document.querySelector('header').classList.add('active');
+    } else {
+        document.querySelector('header').classList.remove('active');
+    }
+}
+
+themeToggler.onclick = function () {
+    document.body.classList.toggle('dark-theme');
+    themeToggler.querySelector('span:nth-child(1)').classList.toggle('active');
+    themeToggler.querySelector('span:nth-child(2)').classList.toggle('active');
+}
+
+function logoutUser() {
+    localStorage.removeItem('token');
+    document.cookie = `jwt_token=; path=/`;
+    window.open('/', '_self');
+}
+
+function deletePatient(patient_id) {
+    fetch(`/api/patients/${patient_id}/`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `${localStorage.getItem('token')}`
+        },
+    })
+        .then(response => {
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert(response.json());
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        });
+}
+
 function calcSampto() {
     return ((2 * (++frame_size)) < 1000) ? 1000 : (500 + (++frame_size))
 }
@@ -52,10 +112,6 @@ async function updateChartData(ecg) {
 
     chart.update();
     console.log("Chart updated");
-}
-
-function renderCreatePatientMessage() {
-
 }
 
 async function renderECG(patient, frame = 0, frame_size = 200) {
@@ -149,3 +205,22 @@ async function nextFrame() {
     await updateChartData(ecg);
     document.querySelector("#page-loader").style.display = "none";
 }
+
+function startRender() {
+    frame_size = document.getElementById('length').value;
+    renderECG(patient, frame, frame_size).then(chartres => {
+        chart = chartres;
+        document.querySelector("#wave-loader").style.display = "none";
+        document.querySelector("#ecgChart").style.display = "block";
+    });
+}
+
+document.getElementById('length').addEventListener('change', () => {
+    frame_size = document.getElementById('length').value;
+    let ecg = fetchECGData(patient, frame, frame_size).then(response => {
+        updateChartData(response);
+    });
+});
+
+setInterval(updateDateTime, 1000);
+updateDateTime();

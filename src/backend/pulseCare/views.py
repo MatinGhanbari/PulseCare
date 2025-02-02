@@ -76,19 +76,43 @@ class DashboardView(APIViewWrapper):
     def get(self, request):
         recent_count = 6
         all_patients_count = len(Patient.objects.all())
-        patients_sorted = Patient.objects.all().order_by('join_date', )
+        patients_sorted = request.user.patients.all().order_by('join_date', )
         recent_patients = patients_sorted if patients_sorted.count() < recent_count else patients_sorted[:recent_count]
-        return render(request, 'pages/dashboard/index.html',
-                      {
-                          'user': request.user,
-                          'all_patients_count': all_patients_count,
-                          'recent_patients': recent_patients
-                      })
+        return render(request, 'pages/dashboard/index.html', {
+            'user': request.user,
+            'all_patients_count': all_patients_count,
+            'recent_patients': recent_patients
+        })
 
 
 class PatientsView(APIViewWrapper):
     def get(self, request):
-        return render(request, 'pages/patients.html', {'user': request.user})
+        recent_count = 6
+        all_patients_count = len(Patient.objects.all())
+        patients_sorted = request.user.patients.all().order_by('join_date', )
+        recent_patients = patients_sorted if patients_sorted.count() < recent_count else patients_sorted[:recent_count]
+        return render(request, 'pages/patients/index.html', {
+            'user': request.user,
+            'all_patients_count': all_patients_count,
+            'recent_patients': recent_patients,
+            'record_length': "00:30:07",
+            'clock_frequency': 360,
+            'all_annotations': "2192 annotations",
+            'annotations': {
+                'N': 2028,
+                'A': 99,
+                'V': 56,
+            },
+            'signals': {
+                'V5': '1 tick per sample; 200 adu/mV; 11-bit ADC, zero at 1024; baseline is 1024',
+                'V2': '1 tick per sample; 200 adu/mV; 11-bit ADC, zero at 1024; baseline is 1024',
+            },
+            'notes': [
+                '84 F 1525 167 x1',
+                'Digoxin',
+                'The rhythm is paced with a demand pacemaker.  The PVCs are multiform.',
+            ]
+        })
 
 
 class PatientCreateView(APIViewWrapper):
@@ -189,7 +213,7 @@ def remove_keys_with_prefix(prefix):
 
 class LogoutView(APIViewWrapper):
     def post(self, request):
-        return render(request, 'pages/patients.html', {'user': request.user})
+        return render(request, 'pages/patients/index.html', {'user': request.user})
 
 
 class RegisterView(APIView):
