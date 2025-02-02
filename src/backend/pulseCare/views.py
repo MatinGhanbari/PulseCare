@@ -74,8 +74,16 @@ def signup(request):
 
 class DashboardView(APIViewWrapper):
     def get(self, request):
-        return render(request, 'pages/dashboard.html',
-                      {'user': request.user, 'all_patients_count': len(Patient.objects.all())})
+        recent_count = 6
+        all_patients_count = len(Patient.objects.all())
+        patients_sorted = Patient.objects.all().order_by('join_date', )
+        recent_patients = patients_sorted if patients_sorted.count() < recent_count else patients_sorted[:recent_count]
+        return render(request, 'pages/dashboard/index.html',
+                      {
+                          'user': request.user,
+                          'all_patients_count': all_patients_count,
+                          'recent_patients': recent_patients
+                      })
 
 
 class PatientsView(APIViewWrapper):

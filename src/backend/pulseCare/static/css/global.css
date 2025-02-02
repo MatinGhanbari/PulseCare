@@ -270,12 +270,19 @@ main {
 
 main .subjects {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.6rem;
+}
+
+
+main .statistics {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.6rem;
 }
 
 main .subjects > div {
-    background-color: var(--color-white);
+    /*background-color: var(--color-white);*/
     padding: var(--card-padding);
     border-radius: var(--card-border-radius);
     margin-top: 1rem;
@@ -363,6 +370,99 @@ main .subjects .progress .number {
 }
 
 main .subjects small {
+    margin-top: 1rem;
+    display: block;
+}
+
+main .statistics > div {
+    /*background-color: var(--color-white);*/
+    padding: var(--card-padding);
+    border-radius: var(--card-border-radius);
+    margin-top: 1rem;
+    box-shadow: var(--box-shadow);
+    transition: all 300ms ease;
+}
+
+main .statistics > div:hover {
+    box-shadow: none;
+}
+
+main .statistics > div span {
+    background-color: var(--color-primary);
+    padding: .5rem;
+    border-radius: 50%;
+    color: var(--color-white);
+    font-size: 1.5rem;
+}
+
+main .statistics > div.mth span, main .subjects > div.cg span {
+    background: var(--color-danger);
+}
+
+main .statistics > div.cs span {
+    background: var(--color-success);
+}
+
+main .statistics h3 {
+    margin: 1rem 0 0.6rem;
+    font-size: 1rem;
+}
+
+main .statistics .progress {
+    position: relative;
+    width: 89px;
+    height: 89px;
+    border-radius: 50%;
+    margin: auto;
+}
+
+main .statistics svg circle {
+    fill: none;
+    stroke: var(--color-primary);
+    stroke-width: 8;
+    stroke-linecap: round;
+    transform: translate(5px, 5px);
+    stroke-dasharray: 110;
+    stroke-dashoffset: 92;
+}
+
+main .statistics .eg svg circle {
+    stroke-dashoffset: 25;
+    stroke-dasharray: 210;
+}
+
+main .statistics .mth svg circle {
+    stroke-dashoffset: 7;
+    stroke-dasharray: 210;
+}
+
+main .statistics .cs svg circle {
+    stroke-dashoffset: 35;
+    stroke-dasharray: 210;
+}
+
+main .statistics .cg svg circle {
+    stroke-dashoffset: 0;
+    stroke-dasharray: 210;
+}
+
+main .statistics .net svg circle {
+    stroke-dashoffset: 5;
+    stroke-dasharray: 210;
+}
+
+main .statistics .progress .number {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+main .statistics small {
     margin-top: 1rem;
     display: block;
 }
@@ -541,6 +641,11 @@ main .timetable.active .closeBtn {
 
     main .subjects {
         grid-template-columns: repeat(2, 1fr);
+        gap: 1;
+    }
+
+    main .statistics-container {
+        grid-template-columns: repeat(4, 4fr);
         gap: 1;
     }
 

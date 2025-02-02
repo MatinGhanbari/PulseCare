@@ -1,0 +1,61 @@
+@import url('global.css');
+
+/* fallback */
+@font-face {
+    font-family: 'Material Icons Sharp';
+    font-style: normal;
+    font-weight: 400;
+    src: url(./fonts/material-icons-sharp/oPWQ_lt5nv4pWNJpghLP75WiFR4kLh3kvmvR.woff2) format('woff2');
+}
+
+.material-icons-sharp {
+    font-family: 'Material Icons Sharp';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+}
+
+.eg {
+    background-image: url(../images/b3.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    color: rgba(0, 0, 0, 0.87);
+    padding: 20px 20px 20px 35px;
+}
+
+.st {
+    background-color: white;
+    color: rgba(0, 0, 0, 0.87);
+    padding: 20px 20px 20px 35px;
+
+}
+
+
+.patients-button {
+    background-color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    padding: 10px 25px;
+    color: #fff;
+    cursor: pointer;
+    outline: none;
+    text-decoration: none;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    transition: all 0.3s;
+    border-radius: 5px;
+}
+
+.patients-button:hover {
+    background-color: var(--color-primary);
+    box-shadow: 0 3px 5px 0 rgba(57, 108, 240, 0.3);
+}

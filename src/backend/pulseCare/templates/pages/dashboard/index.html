@@ -1,0 +1,156 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Dashboard</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{% static 'favicon.ico' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+</head>
+<body>
+<header>
+    <div class="logo" title="PulseCare">
+        <img src="{% static 'images/logo.png' %}" alt="">
+        <h2>Pulse<span class="danger">Care</span></h2>
+    </div>
+    <div class="navbar">
+        <a href="{% url 'dashboard' %}" class="active">
+            <span class="material-icons-sharp">home</span>
+            <h3>Home</h3>
+        </a>
+
+        <a href="{% url 'patients' %}">
+            <span class="material-icons-sharp">people</span>
+            <h3>Patients</h3>
+        </a>
+        <a href="#" onclick="logoutUser()">
+            <span class="material-icons-sharp" onclick="">logout</span>
+            <h3>Logout</h3>
+        </a>
+    </div>
+    <div id="profile-btn">
+        <span class="material-icons-sharp">person</span>
+    </div>
+    <div class="theme-toggler" style="display: none">
+        <span class="material-icons-sharp active">light_mode</span>
+        <span class="material-icons-sharp">dark_mode</span>
+    </div>
+
+</header>
+<div class="container">
+    <aside>
+        <div class="profile">
+            <div class="top">
+                <div class="profile-photo">
+                    <img src="{% static 'images/user-profile.jpg' %}" alt="">
+                </div>
+                <div class="info">
+                    <p>Hi, <b>{{ user }}</b></p>
+                    <small id="datetime" class="text-muted"></small>
+                </div>
+            </div>
+            <div class="about">
+                <h5>Your Patients</h5>
+                <p>{{ user.patients.all|length }}</p>
+                <h5>Last Login</h5>
+                <p>{{ user.last_login }}</p>
+            </div>
+        </div>
+    </aside>
+
+    <main>
+        <h1>Dashboard</h1>
+        <div class="subjects">
+            <div class="eg">
+                <h3>Welcome!</h3>
+                <h1>{{ user.username }}</h1>
+                <br>
+                <small>
+                    Thanks for joining with us.
+                    <br>
+                    We are always trying to get you a complete service
+                </small>
+                <br><br>
+                <a href="#" class="non-style-link">
+                    <button class="patients-button">View My Patients</button>
+                </a>
+            </div>
+        </div>
+
+        <div class="timetable" id="timetable">
+            <div>
+                <h2>Statistics</h2>
+            </div>
+        </div>
+
+        <div class="statistics">
+            <div class="st">
+                <h1>Total Patients</h1>
+                <br>
+                <h2>{{ all_patients_count }}</h2>
+                <small>
+                    Thank you for being a part of our community!
+                    <br>
+                    We are committed to providing you with comprehensive care.
+                </small>
+            </div>
+            <div class="st">
+                <h1>Your Patients</h1>
+                <br>
+                <h2>{{ user.patients.all|length }}</h2>
+                <small>
+                    We appreciate your dedication to your patients.
+                    <br>
+                    Our goal is to support you in delivering exceptional service.
+                </small>
+            </div>
+        </div>
+    </main>
+
+    <div class="right">
+        {#        <div class="announcements">#}
+        {#            <h2>Your Patients</h2>#}
+        {#            <div class="updates">#}
+        {#                <div class="message">#}
+        {#                    <p><b>Academic</b> Summer training internship with Live Projects.</p>#}
+        {#                    <small class="text-muted">2 Minutes Ago</small>#}
+        {#                </div>#}
+        {#                <div class="message">#}
+        {#                    <p><b>Co-curricular</b> Global internship oportunity by Student organization.</p>#}
+        {#                    <small class="text-muted">10 Minutes Ago</small>#}
+        {#                </div>#}
+        {#                <div class="message">#}
+        {#                    <p><b>Examination</b> Instructions for Mid Term Examination.</p>#}
+        {#                    <small class="text-muted">Yesterday</small>#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        </div>#}
+
+        <div class="leaves">
+            <h2>Your Recent Patients</h2>
+            {% for patient in recent_patients %}
+                <div class="teacher pointer-cursor">
+                    <span class="material-icons-sharp">
+                        {% if patient.gender == 'male' %}
+                            person_4
+                        {% else %}
+                            person_3
+                        {% endif %}
+                    </span>
+                    <div class="info">
+                        <h3>{{ patient.first_name }}</h3>
+                        <small class="text-muted">{{ patient.last_name }}</small>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+
+<script src="{% static 'js/dashboard.js' %}"></script>
+</body>
+</html>
