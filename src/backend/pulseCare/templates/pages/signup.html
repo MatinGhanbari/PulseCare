@@ -68,6 +68,15 @@
     </table>
 </div>
 <script>
+    const table = document.querySelector('table');
+    table.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            registerUser();
+        }
+    });
+</script>
+<script>
     function registerUser() {
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
