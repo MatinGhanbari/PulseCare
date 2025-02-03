@@ -398,3 +398,30 @@ input.range::-ms-fill-upper {
 .material-icons-sharp:hover small {
     color: var(--color-primary);
 }
+
+.s-hidden {
+    visibility: hidden;
+    padding-right: 10px;
+}
+
+.select {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    font-size: 1rem;
+    width: 40%;
+    height: 100%;
+    border: none;
+    background-color: transparent;
+    text-align: center;
+    overflow: hidden;
+    white-space: pre;
+    text-overflow: ellipsis;
+    -webkit-appearance: none;
+}
+
+.select:hover {
+    cursor: pointer;
+    color: var(--color-primary);
+    text-shadow: var(--color-primary) 0 0 50px;
+}

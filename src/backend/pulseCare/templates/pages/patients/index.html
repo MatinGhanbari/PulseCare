@@ -153,7 +153,21 @@
             </div>
             <div class="control-subjects">
                 <div class="eg ">
-                    test
+                    <div class="flex-row-between" style="flex-wrap: nowrap">
+                        <h4>Searching For Annotations:</h4>
+                        <div class="flex-row-between">
+                            <div id="ann_back" class="pagination_item">
+                                <small class="material-icons-sharp margin-0">arrow_back_ios</small>
+                            </div>
+
+                            <select id="annselect" class="select input-text"></select>
+
+                            <div id="ann_forward" class="pagination_item">
+                                <small class="material-icons-sharp margin-0">arrow_forward_ios</small>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="eg">
                     <div>
@@ -200,6 +214,10 @@
                 <div class="eg">
                     <div class="control-item">
                         <div style="width: 100%">
+                            <div class="flex-row-between" style="flex-wrap: nowrap">
+                                <h4>Window duration:</h4>
+                                <small id="total_length" class="text-muted margin-0">test</small>
+                            </div>
                             <fieldset class="range__field">
                                 <input class="range" id="length" type="range" min="1" max="60" value="5">
                                 <svg role="presentation" width="100%" height="10" xmlns="http://www.w3.org/2000/svg">

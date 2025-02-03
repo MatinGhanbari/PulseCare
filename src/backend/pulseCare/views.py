@@ -154,6 +154,9 @@ class PatientDetailView(APIViewWrapper):
         annotations = {}
         for sym in annotations_symbols:
             annotations[sym] = [i for (i, n) in enumerate(ann.symbol) if n == sym]
+            annotations_details = {}
+        for i, an in enumerate(annotations):
+            annotations_details[an] = [ann.sample[x] for x in annotations[an]]
         for i, an in enumerate(annotations):
             annotations[an] = len(annotations[an])
         annotations = sorted(annotations.items(), key=lambda x: x[1], reverse=True)
@@ -175,6 +178,7 @@ class PatientDetailView(APIViewWrapper):
                 'record_length': record_length,
                 'clock_frequency': clock_frequency,
                 'all_annotations': annotations_count,
+                'annotations_details': annotations_details,
                 'annotations': annotations,
                 'signals': signals,
                 'notes': notes,
@@ -182,7 +186,7 @@ class PatientDetailView(APIViewWrapper):
         }
 
         try:
-            redis_client.set(redis_key, json.dumps(response))
+            redis_client.set(redis_key, json.dumps(response, cls=NumpyEncoder))
         except ConnectionError as error:
             print(f"Redis is unavailable! Message: {str(error)}")
         return Response(response)

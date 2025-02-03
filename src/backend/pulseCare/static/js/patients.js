@@ -1,6 +1,9 @@
 var chart = null;
 let patient = null;
 let frame = 0;
+let ann_detail = null;
+let ann_detail_pointer = 0;
+let record_fs = 1;
 
 const sideMenu = document.querySelector("aside");
 const themeToggler = document.querySelector(".theme-toggler");
@@ -112,7 +115,7 @@ function deletePatient(patient_id) {
 
 async function fetchPatientDetailsData(patient) {
     const token = localStorage.getItem('token');
-    const response = await fetch(`http://127.0.0.1:8000/api/patients/${patient}?format=json`, {
+    const response = await fetch(`http://127.0.0.1:8000/api/patients/${patient}/?format=json`, {
         method: 'GET', headers: {
             'Content-Type': 'application/json', 'Authorization': `${token}`
         }, credentials: 'include'
@@ -135,6 +138,8 @@ async function fetchECGData(patient, frame = 0) {
         }, credentials: 'include'
     });
     if (!response.ok) {
+        // console.log(frame);
+        // console.log(frame_size);
         console.log("An error has occurred during processing.");
         return;
     }
@@ -156,7 +161,7 @@ async function updateChartData(ecg) {
     const {
         ecg_data, // peaks
     } = processECGData(ecg);
-    let length = document.getElementById('length').value;
+    // let length = document.getElementById('length').value;
 
     if (chart == null) return;
 
@@ -176,6 +181,12 @@ async function updateChartData(ecg) {
 
     chart.data.labels = ecg_data.map(x => x[0]);
     chart.data.datasets[0].data = ecg_data.map(x => x[1]);
+    chart.options.plugins.annotation.annotations.annline =
+        {
+            type: 'line',
+            borderColor: 'rgb(255, 99, 132)',
+            borderWidth: 0,
+        };
 
     chart.update();
 }
@@ -215,8 +226,16 @@ async function renderECG(patient, frame = 0) {
                     title: {
                         display: true, text: 'Time (ms)',
                     }, ticks: {
-                        maxTicksLimit: 11, bounds: 'ticks', // Include bounds for the ticks
-                        includeBounds: true // Ensure the first and last ticks are included
+                        maxTicksLimit: 6, bounds: 'ticks', // Include bounds for the ticks
+                        includeBounds: true, // Ensure the first and last ticks are included
+                        callback: function (value) {
+                            return secondsToHMS(value / 1000);
+                            // if (value > 1000) {
+                            //     return Math.floor(value / 1000) + "s";
+                            // } else {
+                            //     return value + "ms";
+                            // }
+                        }
                     }
                 }, y: {
                     title: {
@@ -306,13 +325,18 @@ document.getElementById('length').addEventListener('change', () => {
 
 async function changePatient(id) {
     var pt = document.getElementById(`teacher-${patient}`);
+    var annotaion_box = document.getElementById(`annselect`);
+    var total_length = document.getElementById(`total_length`);
     pt.classList.remove('selected-patient');
 
     frame = 0;
     patient = id;
 
     const patient_details = await fetchPatientDetailsData(patient);
+    ann_detail = patient_details.pulse_details.annotations_details;
     record_length.innerHTML = secondsToHMS(patient_details.pulse_details.record_length);
+    total_length.innerHTML = `Total: ${record_length.innerHTML}`;
+    record_fs = patient_details.pulse_details.clock_frequency;
     clock_frequency.innerHTML = `${patient_details.pulse_details.clock_frequency} ticks per second`;
     all_annotations.innerHTML = `${patient_details.pulse_details.all_annotations} annotations`;
     cur_patient_gender.innerHTML = patient_details.gender;
@@ -324,17 +348,17 @@ async function changePatient(id) {
     } else {
         cur_patient_img.innerHTML = 'person_3';
     }
-    annotators.innerHTML = ``;
+    annotators.innerHTML = '';
+    annotaion_box.innerHTML = '';
     for (const key in patient_details.pulse_details.annotations) {
         let annotation = patient_details.pulse_details.annotations[key];
         var ann_name = annotation[0].padEnd(10, ' ');
-        annotators.innerHTML += `
-        <h4>${ann_name}:
-        <p style="display: inline;">
-            ${annotation[1]}
-        </p>
-        </h4>
-        `;
+        annotators.innerHTML += `<h4>${ann_name}:<p style="display: inline;">${annotation[1]}</p></h4>`;
+
+        var option = document.createElement("option");
+        option.text = ann_name;
+        option.value = ann_name;
+        annotaion_box.add(option);
     }
     signals.innerHTML = ``;
     for (const patient_detailsKey in patient_details.pulse_details.signals) {
@@ -365,7 +389,8 @@ function secondsToHMS(seconds) {
     // Calculate hours, minutes, and seconds
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
+    const secs = Number((seconds % 60).toFixed(2));
+    // const secs = seconds % 60;
 
     // Format the output to always have two digits
     return [String(hours).padStart(2, '0'), String(minutes).padStart(2, '0'), String(secs).padStart(2, '0')].join(':');
@@ -424,3 +449,87 @@ time_m_inc.addEventListener('click', () => UpdateSeekTime(time_h.innerHTML, Numb
 time_m_dec.addEventListener('click', () => UpdateSeekTime(time_h.innerHTML, Number(time_m.innerHTML) - 1, time_s.innerHTML));
 time_s_inc.addEventListener('click', () => UpdateSeekTime(time_h.innerHTML, time_m.innerHTML, Number(time_s.innerHTML) + 1));
 time_s_dec.addEventListener('click', () => UpdateSeekTime(time_h.innerHTML, time_m.innerHTML, Number(time_s.innerHTML) - 1));
+
+
+const ann_back = document.getElementById("ann_back");
+const ann_forward = document.getElementById("ann_forward");
+const annselect = document.getElementById("annselect");
+
+async function findNextAnn(value) {
+    var frame_size = document.getElementById('length').value;
+    const frm = frame;
+    for (let i = 0; i < Object.keys(ann_detail).length; i++) {
+        if (String(value.trim().toLowerCase()) === String(Object.keys(ann_detail)[i].trim().toLowerCase())) {
+            try {
+                const patient_details = await fetchPatientDetailsData(patient);
+                ann_detail = patient_details.pulse_details.annotations_details;
+
+                var x = ann_detail[Object.keys(ann_detail)[i]];
+                var array = x.filter(a => a > ann_detail_pointer);
+                if (array.length <= 0) return;
+
+                var y = array[0] / record_fs;
+                if (y == null || value !== value) return;
+                ann_detail_pointer = array[0];
+
+                frame = y / Number(frame_size);
+
+                const ecg = await fetchECGData(patient, Math.floor(frame));
+                await updateChartData(ecg);
+
+                chart.options.plugins.annotation.annotations.annline =
+                    {
+                        type: 'line',
+                        xMin: y * 1000,
+                        xMax: y * 1000,
+                        borderColor: 'rgb(255, 99, 132)',
+                        borderWidth: 2,
+                    };
+                chart.update();
+            } catch (e) {
+                frame = frm;
+            }
+        }
+    }
+}
+
+async function findPrevAnn(value) {
+    var frame_size = document.getElementById('length').value;
+    const frm = frame;
+    for (let i = 0; i < Object.keys(ann_detail).length; i++) {
+        if (String(value.trim().toLowerCase()) === String(Object.keys(ann_detail)[i].trim().toLowerCase())) {
+            try {
+                const patient_details = await fetchPatientDetailsData(patient);
+                ann_detail = patient_details.pulse_details.annotations_details;
+
+                var x = ann_detail[Object.keys(ann_detail)[i]];
+                var array = x.filter(a => a < ann_detail_pointer);
+                if (array.length <= 0) return;
+
+                var y = array[array.length - 1] / record_fs;
+                if (y == null || value !== value) return;
+                ann_detail_pointer = array[array.length - 1];
+
+                frame = y / Number(frame_size);
+
+                const ecg = await fetchECGData(patient, Math.floor(frame));
+                await updateChartData(ecg);
+
+                chart.options.plugins.annotation.annotations.annline =
+                    {
+                        type: 'line',
+                        xMin: y * 1000,
+                        xMax: y * 1000,
+                        borderColor: 'rgb(255, 99, 132)',
+                        borderWidth: 2,
+                    };
+                chart.update();
+            } catch (e) {
+                frame = frm;
+            }
+        }
+    }
+}
+
+ann_forward.addEventListener('click', () => findNextAnn(annselect.value));
+ann_back.addEventListener('click', () => findPrevAnn(annselect.value));
