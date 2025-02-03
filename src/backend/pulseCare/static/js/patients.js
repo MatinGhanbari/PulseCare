@@ -390,7 +390,6 @@ function secondsToHMS(seconds) {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = Number((seconds % 60).toFixed(2));
-    // const secs = seconds % 60;
 
     // Format the output to always have two digits
     return [String(hours).padStart(2, '0'), String(minutes).padStart(2, '0'), String(secs).padStart(2, '0')].join(':');
