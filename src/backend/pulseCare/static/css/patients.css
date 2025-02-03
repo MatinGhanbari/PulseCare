@@ -55,9 +55,15 @@
     box-shadow: 0 3px 5px 0 rgba(57, 108, 240, 0.3);
 }
 
+main .control-subjects {
+    display: grid;
+    grid-template-columns: 4fr 1fr;
+    gap: 1.6rem;
+}
+
 main .statistics {
     display: grid;
-    grid-template-columns: 1fr 4fr 0fr;
+    grid-template-columns: 1fr 4fr;
     gap: 1.6rem;
 }
 
@@ -77,6 +83,7 @@ main .statistics {
 
 .signals-container {
     padding-left: 2%;
+    width: 100%;
 }
 
 .black-text {
@@ -122,14 +129,8 @@ main .statistics {
     padding: 1%;
 }
 
-main .control-subjects {
-    display: grid;
-    grid-template-columns:  4fr  1fr 0fr;
-    gap: 1.6rem;
-}
-
 .pagination-container {
-    /*background-color: cornflowerblue;*/
+    /*background-color: var(--color-primary);*/
 }
 
 .pagination {
@@ -264,4 +265,51 @@ input.range::-ms-fill-upper {
 
 .range__field {
     border: 0;
+}
+
+.patient-tab-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    align-items: center;
+    width: 100%;
+    /*border-bottom: 2px solid var(--color-primary-light);*/
+}
+
+.patient-tab {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px 15px 0 0;
+    border-width: 1px;
+    width: 20%;
+    height: 4rem;
+    margin-bottom: -1px;
+}
+
+.patient-tab:hover {
+    color: var(--color-primary);
+    cursor: pointer;
+}
+
+.patient-tab-active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px 15px 0 0;
+    border-width: 1px;
+    width: 20%;
+    height: 4rem;
+    background: linear-gradient(180deg, var(--color-primary-light), transparent);
+    border-bottom: 1px solid var(--color-primary-light);
+}
+
+.pulse-wrapper {
+    justify-content: center;
+    align-items: center;
+    width: 80%;
+    margin-left: 10%;
+}
+
+.pulse-canvas {
 }

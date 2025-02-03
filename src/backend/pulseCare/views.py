@@ -1,13 +1,8 @@
 import datetime
-import json
-import os
 import shutil
 from threading import Thread
 
 import jwt
-import neurokit2 as nk
-import numpy as np
-import redis
 import wfdb
 from backend.settings import SECRET_KEY
 from django.contrib.auth import authenticate
@@ -15,7 +10,6 @@ from django.core.files.storage import FileSystemStorage
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
-from redis.exceptions import ConnectionError
 from rest_framework import status
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed, NotAuthenticated
@@ -24,14 +18,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from .data_access import *
 from .models import User, Patient
-
-# Initialize Redis connection
-redis_client = redis.StrictRedis(
-    host=os.getenv('REDIS_HOST'),
-    port=os.getenv('REDIS_PORT'),
-    db=os.getenv('REDIS_DB')
-)
 
 
 class JWTAuthentication(BaseAuthentication):
@@ -95,23 +83,6 @@ class PatientsView(APIViewWrapper):
             'user': request.user,
             'all_patients_count': all_patients_count,
             'recent_patients': recent_patients,
-            'record_length': "00:30:07",
-            'clock_frequency': 360,
-            'all_annotations': "2192 annotations",
-            'annotations': {
-                'N': 2028,
-                'A': 99,
-                'V': 56,
-            },
-            'signals': {
-                'V5': '1 tick per sample; 200 adu/mV; 11-bit ADC, zero at 1024; baseline is 1024',
-                'V2': '1 tick per sample; 200 adu/mV; 11-bit ADC, zero at 1024; baseline is 1024',
-            },
-            'notes': [
-                '84 F 1525 167 x1',
-                'Digoxin',
-                'The rhythm is paced with a demand pacemaker.  The PVCs are multiform.',
-            ]
         })
 
 
@@ -173,7 +144,7 @@ class PatientDetailView(APIViewWrapper):
         directory_path = os.path.join('datasets', 'patients', str(patient.id))
 
         prefix = f"ecg_data:{pk}"
-        remove_keys_with_prefix(prefix)
+        remove_keys_with_prefix(redis_client, prefix)
         shutil.rmtree(directory_path)
 
         os.makedirs(directory_path, exist_ok=False)
@@ -196,19 +167,6 @@ class PatientDetailView(APIViewWrapper):
         remove_keys_with_prefix(prefix)
 
         return Response({"message": "Deleted successfully!"})
-
-
-def remove_keys_with_prefix(prefix):
-    try:
-        cursor = 0
-        while True:
-            cursor, keys = redis_client.scan(cursor, match=f"{prefix}*")
-            if keys:
-                redis_client.delete(*keys)
-            if cursor == 0:
-                break
-    except ConnectionError as error:
-        print(f"Redis is unavailable! Message: {str(error)}")
 
 
 class LogoutView(APIViewWrapper):
@@ -253,12 +211,11 @@ class LoginView(APIView):
 class ECGView(APIViewWrapper):
     def get(self, request):
         start = int(request.GET.get('start', 0))
-        length = int(request.GET.get('length', 500))
-        sampto = int(request.GET.get('sampto', 10_000))
+        length = int(request.GET.get('length', 5))
         patient = str(request.GET.get('patient'))
 
         # Generate a unique key based on request parameters
-        redis_key = f"ecg_data:{patient}:{start}:{length}:{sampto}"
+        redis_key = f"ecg_data:{patient}:{start}:{length}"
 
         # Check if data exists in Redis
         try:
@@ -272,106 +229,81 @@ class ECGView(APIViewWrapper):
         files = [f for f in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, f))]
         record_path = str(os.path.join(directory_path, files[0].split(".")[0]))
 
-        try:
-            record = wfdb.rdrecord(record_path, sampto=sampto)
-        except ValueError as e:
-            record = wfdb.rdrecord(record_path)
+        record = wfdb.rdrecord(record_path)
+        ann = wfdb.rdann(record_path, 'atr')
+
+        annotations_count = ann.ann_len
+        record_length = int(round(record.sig_len / record.fs, 0))
+        clock_frequency = record.fs
+
+        for (i, note) in enumerate(ann.aux_note):
+            if note != "":
+                ann.symbol[i] = note.replace('\x00', '')
+        annotations_symbols = list(set(ann.symbol))
+        annotations = {}
+        for sym in annotations_symbols:
+            annotations[sym] = [i for (i, n) in enumerate(ann.symbol) if n == sym]
+        for i, an in enumerate(annotations):
+            annotations[an] = len(annotations[an])
+        annotations = sorted(annotations.items(), key=lambda x: x[1], reverse=True)
+        signals = {}
+        for i, sig in enumerate(record.sig_name):
+            signals[sig] = (f"{record.samps_per_frame[i]} tick per sample; "
+                            f"{record.adc_gain[i]} adu/mV; "
+                            f"{record.adc_res[i]}-bit ADC, zero at {record.adc_zero[i]}; "
+                            f"baseline is {record.baseline[i]}")
+        notes = record.comments
 
         # Delineate the ECG signal
-        try:
-            ecg_signal = record.p_signal[0:sampto, 0]
-            _, rpeaks = nk.ecg_peaks(ecg_signal, sampling_rate=record.fs)
-            _, waves_peak = nk.ecg_delineate(ecg_signal, rpeaks, sampling_rate=record.fs, method="peak")
-        except ValueError as e:
-            ecg_signal = record.p_signal[:, 0]
-            _, rpeaks = nk.ecg_peaks(ecg_signal, sampling_rate=record.fs)
-            try:
-                _, waves_peak = nk.ecg_delineate(ecg_signal, rpeaks, sampling_rate=record.fs, method="peak")
-            except ValueError as e:
-                waves_peak = {'ECG_R_Peaks': [], 'ECG_T_Peaks': [], 'ECG_P_Peaks': [], 'ECG_Q_Peaks': [],
-                              'ECG_S_Peaks': []}
+        sig_start = start * clock_frequency
+        sig_end = (length + start) * clock_frequency
+        # if length > 5 else (5 + start) * clock_frequency
+        ecg_signal = record.p_signal[sig_start:sig_end, 0]
 
-        ecg_data = ecg_signal.tolist()[start:start + length]
+        # rpeaks = {}
+        # waves_peak = {}
+        # try:
+        #     _, rpeaks = nk.ecg_peaks(ecg_signal, sampling_rate=record.fs)
+        #     _, waves_peak = nk.ecg_delineate(ecg_signal, rpeaks, sampling_rate=record.fs, method="peak")
+        # except Exception as e:
+        #     print(f"Error with patient {patient}, start: {start}, length: {length}: " + str(e))
+        #     waves_peak = {'ECG_P_Peaks': [], 'ECG_Q_Peaks': [], 'ECG_S_Peaks': [], 'ECG_T_Peaks': []}
 
-        waves_peak['ECG_R_Peaks'] = rpeaks['ECG_R_Peaks']
-        response = generate_ecg_response(ecg_data, waves_peak, start, length)
+        # ecg_signal = ecg_signal[sig_start:(length + start) * clock_frequency
+        #                         :int((length + start) * clock_frequency / 2000)
+        #                         if (length + start) * clock_frequency > 2000 else 1]
+
+        ecg_signal = record.p_signal[sig_start:sig_end:int((length + start) * clock_frequency / 2000)
+        if (length + start) * clock_frequency > 2000 else 1, 0]
+
+        response = {
+            'ecg_data': ecg_signal,
+            # 'ECG_P_Peaks': [num - sig_start for num in waves_peak['ECG_P_Peaks'] if sig_start < num < sig_end] if
+            # waves_peak['ECG_P_Peaks'] else [],
+            # 'ECG_Q_Peaks': [num - sig_start for num in waves_peak['ECG_Q_Peaks'] if sig_start < num < sig_end] if
+            # waves_peak['ECG_Q_Peaks'] else [],
+            # 'ECG_R_Peaks': [num - sig_start for num in rpeaks['ECG_R_Peaks'] if sig_start < num < sig_end],
+            # 'ECG_S_Peaks': [num - sig_start for num in waves_peak['ECG_S_Peaks'] if sig_start < num < sig_end] if
+            # waves_peak['ECG_S_Peaks'] else [],
+            # 'ECG_T_Peaks': [num - sig_start for num in waves_peak['ECG_T_Peaks'] if sig_start < num < sig_end] if
+            # waves_peak['ECG_T_Peaks'] else [],
+            'record_length': record_length,
+            'clock_frequency': clock_frequency,
+            'all_annotations': annotations_count,
+            'annotations': annotations,
+            'signals': signals,
+            'notes': notes,
+            'patient': {
+                'first_name': Patient.objects.get(id=patient).first_name,
+                'last_name': Patient.objects.get(id=patient).last_name,
+                'gender': Patient.objects.get(id=patient).gender,
+                'age': Patient.objects.get(id=patient).age,
+            }
+        }
 
         # Store the response data in Redis
-        try:
-            redis_client.set(redis_key, json.dumps(response, cls=NumpyEncoder))
-        except ConnectionError as error:
-            print(f"Redis is unavailable! Message: {str(error)}")
+        # try:
+        #     redis_client.set(redis_key, json.dumps(response, cls=NumpyEncoder))
+        # except ConnectionError as error:
+        #     print(f"Redis is unavailable! Message: {str(error)}")
         return Response(response)
-
-
-def generate_ecg_response(ecg_data, peaks, start, length):
-    filtered_p_peaks = [num - start for num in peaks['ECG_P_Peaks'] if start < num < start + length]
-    filtered_q_peaks = [num - start for num in peaks['ECG_Q_Peaks'] if start < num < start + length]
-    filtered_r_peaks = [num - start for num in peaks['ECG_R_Peaks'] if start < num < start + length]
-    filtered_s_peaks = [num - start for num in peaks['ECG_S_Peaks'] if start < num < start + length]
-    filtered_t_peaks = [num - start for num in peaks['ECG_T_Peaks'] if start < num < start + length]
-
-    return {
-        'ecg_data': ecg_data,
-        'ECG_P_Peaks': filtered_p_peaks,
-        'ECG_Q_Peaks': filtered_q_peaks,
-        'ECG_R_Peaks': filtered_r_peaks,
-        'ECG_S_Peaks': filtered_s_peaks,
-        'ECG_T_Peaks': filtered_t_peaks,
-    }
-
-
-class NumpyEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.integer):
-            return int(obj)
-        if isinstance(obj, np.floating):
-            return float(obj)
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        return json.JSONEncoder.default(self, obj)
-
-
-def analyse_patient_data(patient_id):
-    try:
-        print(f"Start patient {patient_id} details process.")
-        start = 0
-        length = 1000
-        sampto = 1502
-        patient = patient_id
-
-        # Generate a unique key based on request parameters
-        redis_key = f"ecg_data:{patient}:{start}:{length}:{sampto}"
-
-        directory_path = os.path.join('datasets', 'patients', str(patient))
-        files = [f for f in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, f))]
-        record_path = str(os.path.join(directory_path, files[0].split(".")[0]))
-
-        try:
-            record = wfdb.rdrecord(record_path, sampto=sampto)
-        except ValueError as e:
-            record = wfdb.rdrecord(record_path)
-
-        # Delineate the ECG signal
-        try:
-            ecg_signal = record.p_signal[0:sampto, 0]
-            _, rpeaks = nk.ecg_peaks(ecg_signal, sampling_rate=record.fs)
-            _, waves_peak = nk.ecg_delineate(ecg_signal, rpeaks, sampling_rate=record.fs, method="peak")
-        except ValueError as e:
-            ecg_signal = record.p_signal[:, 0]
-            _, rpeaks = nk.ecg_peaks(ecg_signal, sampling_rate=record.fs)
-            try:
-                _, waves_peak = nk.ecg_delineate(ecg_signal, rpeaks, sampling_rate=record.fs, method="peak")
-            except ValueError as e:
-                waves_peak = {'ECG_R_Peaks': [], 'ECG_T_Peaks': [], 'ECG_P_Peaks': [], 'ECG_Q_Peaks': [],
-                              'ECG_S_Peaks': []}
-
-        ecg_data = ecg_signal.tolist()[start:start + length]
-        waves_peak['ECG_R_Peaks'] = rpeaks['ECG_R_Peaks']
-        response = generate_ecg_response(ecg_data, waves_peak, start, length)
-
-        # Store the response data in Redis
-        redis_client.set(redis_key, json.dumps(response, cls=NumpyEncoder))
-        print(f"Patient {patient_id} pulse details done.")
-    except ConnectionError as error:
-        print(f"Redis is unavailable! Message: {str(error)}")

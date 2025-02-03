@@ -5,6 +5,7 @@
 
 :root {
     --color-primary: #7380ec;
+    --color-primary-light: rgba(115, 128, 236, 0.27);
     --color-danger: #ff7782;
     --color-success: #41f1b6;
     --color-warning: #ffbb55;
@@ -837,5 +838,9 @@ main .timetable.active .closeBtn {
 
 .pointer-cursor {
     cursor: pointer;
+}
+
+.color-primary {
+    color: var(--color-primary);
 }
 

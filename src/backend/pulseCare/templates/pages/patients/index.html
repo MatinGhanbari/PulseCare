@@ -10,13 +10,12 @@
     <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
     <link rel="stylesheet" href="{% static 'css/patients.css' %}">
     <script src="{% static 'js/flowbite.min.js' %}"></script>
-    <script src="{% static 'js/chart.js' %}"></script>
 </head>
 <body>
 <header>
     <div class="logo" title="PulseCare">
         <img src="{% static 'images/logo.png' %}" alt="">
-        <h2>Pulse<span class="danger">Care</span></h2>
+        <h2>Pulse<span class="color-primary">Care</span></h2>
     </div>
     <div class="navbar">
         <a href="{% url 'dashboard' %}">
@@ -64,125 +63,132 @@
     </aside>
 
     <main>
-        <h1>Patient</h1>
-        <div class="statistics">
-            <div class="st">
-                <div class="patient-img">
-                    <span class="material-icons-sharp">
-                        {% if patient.gender == 'male' %}
-                            person_4
-                        {% else %}
-                            person_3
-                        {% endif %}
+        <div class="patient-tab-container">
+            <h1 id="patient-tab-table" class="patient-tab patient-tab-active">Table</h1>
+            <h1 id="patient-tab-pulse" class="patient-tab">Pulse</h1>
+        </div>
+        <div id="patient-table">
+            <div class="statistics">
+                <div class="st">
+                    <div class="patient-img">
+                    <span id="cur-patient-img" class="material-icons-sharp">
+
                     </span>
+                        <br>
+                        <h2 id="cur-patient-firstname" class="patient-name"></h2>
+                        <h2 id="cur-patient-lastname" class="patient-name"></h2>
+                    </div>
+                    <div class="patient-section">
+                        <small class="text-muted">Gender</small>
+                        <small id="cur-patient-gender" class="text-muted black-text"></small>
+                        <small class="text-muted">Age</small>
+                        <small id="cur-patient-age" class="text-muted black-text"></small>
+                    </div>
+
+                </div>
+                <div class="st">
+                    <h2>Summary Table</h2>
                     <br>
-                    <h2 class="patient-name">{{ user.patients.first.first_name }}</h2>
-                    <h2 class="patient-name">{{ user.patients.first.last_name }}</h2>
-                </div>
-                <div class="patient-section">
-                    <small class="text-muted">Gender</small>
-                    <small class="text-muted black-text">{{ user.patients.first.gender|upper }}</small>
-                    <small class="text-muted">Age</small>
-                    <small class="text-muted black-text">{{ user.patients.first.age }}</small>
-                </div>
-
-            </div>
-            <div class="st">
-                <h2>Summary Table</h2>
-                <br>
-                <div class="summary-item">
-                    <p class="black-text">Record length: </p>
-                    <p style="display: inline">{{ record_length }}</p>
-                </div>
-                <div class="summary-item">
-                    <p class="black-text">Clock frequency: </p>
-                    <p style="display: inline">{{ clock_frequency }} ticks per second</p>
-                </div>
-                <div class="summary-item">
-                    <p class="black-text">Annotator: </p>
-                    <p style="display: inline">{{ all_annotations }}</p>
-                </div>
-                <div class="summary-item">
-                    <p class="black-text">Signals: </p>
-                </div>
-                <div class="summary-item">
-                    <div class="signals-container">
-                        {% for key, value in signals.items %}
-                            <h4>{{ key }}</h4>
-                            <p style="display: inline">{{ value }}</p>
-                        {% endfor %}
+                    <div class="summary-item">
+                        <p class="black-text">Record length: </p>
+                        <p id="record_length" style="display: inline"></p>
                     </div>
-                </div>
-                <div class="summary-item">
-                    <h3>Notes:
-                        <small class="text-muted">
-                            {% for note in notes %}
-                                - {{ note }}<br>
-                            {% endfor %}
-                        </small>
-                    </h3>
-                </div>
-            </div>
-        </div>
+                    <div class="summary-item">
+                        <p class="black-text">Clock frequency: </p>
+                        <p id="clock_frequency" style="display: inline"></p>
+                    </div>
+                    <div class="summary-item">
+                        <p class="black-text">Annotator: </p>
+                        <p id="all_annotations" style="display: inline"></p>
+                    </div>
+                    <div class="summary-item">
+                        <div id="annotators" class="signals-container">
 
-        <div class="timetable" id="timetable">
-            <div>
-                <h2>Controls</h2>
-            </div>
-        </div>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <p class="black-text">Signals: </p>
+                    </div>
+                    <div class="summary-item">
+                        <div id="signals" class="signals-container">
 
-        <div class="control-subjects">
-            <div class="eg">
-                <div class="control-item">
-                    <h2>Pulse Length</h2>
-                    <div style="width: 68%">
-                        <fieldset class="range__field">
-                            <input class="range" id="length" type="range" min="1" max="60" value="5">
-                            <svg role="presentation" width="100%" height="10" xmlns="http://www.w3.org/2000/svg">
-                                <rect class="range__tick" x="0%" y="3" width="1" height="10"></rect>
-                                <rect class="range__tick" x="8.3%" y="3" width="1" height="10"></rect>
-                                <rect class="range__tick" x="16.6%" y="3" width="1" height="10"></rect>
-                                <rect class="range__tick" x="33.3%" y="3" width="1" height="10"></rect>
-                                <rect class="range__tick" x="66.6%" y="3" width="1" height="10"></rect>
-                                <rect class="range__tick" x="100%" y="3" width="1" height="10"></rect>
-                            </svg>
-                            <svg role="presentation" width="102%" height="16" xmlns="http://www.w3.org/2000/svg">
-                                <text class="range__point" x="0%" y="14" text-anchor="start">1s</text>
-                                <text class="range__point" x="8.3%" y="14" text-anchor="middle">5s</text>
-                                <text class="range__point" x="16.6%" y="14" text-anchor="middle">10s</text>
-                                <text class="range__point" x="33.3%" y="14" text-anchor="middle">20s</text>
-                                <text class="range__point" x="66.6%" y="14" text-anchor="middle">40s</text>
-                                <text class="range__point" x="97%" y="14" text-anchor="middle">60s</text>
-                            </svg>
-                        </fieldset>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <h3>Notes:
+                            <small id="notes" class="text-muted">
+
+                            </small>
+                        </h3>
                     </div>
                 </div>
             </div>
-            <div class="eg pagination-container">
-                <div class="pagination">
-                    <div class="pagination_item"><small class="material-icons-sharp">arrow_back_ios</small>Prev</div>
-                    <div style="font-size: 2.5rem">|</div>
-                    <div class="pagination_item"><small class="material-icons-sharp">arrow_forward_ios</small>Next</div>
-                </div>
-            </div>
         </div>
 
-        <div class="timetable" id="timetable">
-            <div>
-                <h2>Pulse</h2>
-            </div>
-        </div>
-        <div class="subjects">
-            <div id="wave-loader">
-                <div class="wave-container">
-                    <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
-                    <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
-                    <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
-                    <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
-                    <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+        <div id="patient-pulse" style="display: none">
+            <div class="subjects">
+                <div class="eg">
+                    <div id="wave-loader">
+                        <div class="wave-container">
+                            <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                            <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                            <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                            <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                            <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                        </div>
+                    </div>
+                    <div class="pulse-wrapper">
+                        <div id="page-loader" style="display: none">
+                            <div class="wave-container">
+                                <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                                <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                                <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                                <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                                <div class="wave-bar bg-gray-500 dark:bg-gray-400"></div>
+                            </div>
+                        </div>
+                        <canvas class="" id="ecgChart" style="display: none;"></canvas>
+                    </div>
                 </div>
             </div>
-            <canvas class="pulse" id="ecgChart" style="display: none;"></canvas>
+            <div class="control-subjects">
+                <div class="eg">
+                    <div class="control-item">
+                        <h2>Pulse Length</h2>
+                        <div style="width: 68%">
+                            <fieldset class="range__field">
+                                <input class="range" id="length" type="range" min="1" max="60" value="5">
+                                <svg role="presentation" width="100%" height="10" xmlns="http://www.w3.org/2000/svg">
+                                    <rect class="range__tick" x="0%" y="3" width="1" height="10"></rect>
+                                    <rect class="range__tick" x="8.3%" y="3" width="1" height="10"></rect>
+                                    <rect class="range__tick" x="16.6%" y="3" width="1" height="10"></rect>
+                                    <rect class="range__tick" x="33.3%" y="3" width="1" height="10"></rect>
+                                    <rect class="range__tick" x="66.6%" y="3" width="1" height="10"></rect>
+                                    <rect class="range__tick" x="100%" y="3" width="1" height="10"></rect>
+                                </svg>
+                                <svg role="presentation" width="102%" height="16" xmlns="http://www.w3.org/2000/svg">
+                                    <text class="range__point" x="0%" y="14" text-anchor="start">1s</text>
+                                    <text class="range__point" x="8.3%" y="14" text-anchor="middle">5s</text>
+                                    <text class="range__point" x="16.6%" y="14" text-anchor="middle">10s</text>
+                                    <text class="range__point" x="33.3%" y="14" text-anchor="middle">20s</text>
+                                    <text class="range__point" x="66.6%" y="14" text-anchor="middle">40s</text>
+                                    <text class="range__point" x="97%" y="14" text-anchor="middle">60s</text>
+                                </svg>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+                <div class="eg pagination-container">
+                    <div class="pagination">
+                        <div id="perv-frame" class="pagination_item"><small
+                                class="material-icons-sharp">arrow_back_ios</small>Prev
+                        </div>
+                        <div style="font-size: 2.5rem">|</div>
+                        <div id="next-frame" class="pagination_item"><small class="material-icons-sharp">arrow_forward_ios</small>Next
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
 
@@ -190,9 +196,9 @@
 
     <div class="right">
         <div class="leaves">
-            <h2>Your All Patients <p style="display: inline;font-size: 1rem">({{ user.patients.all|length }})</p></h2>
+            <h2>Your Patients <p style="display: inline;font-size: 1rem">({{ user.patients.all|length }})</p></h2>
             {% for patient in user.patients.all %}
-                <div class="teacher pointer-cursor">
+                <div class="teacher pointer-cursor" onclick="changePatient({{ patient.id }})">
                     <span class="material-icons-sharp">
                         {% if patient.gender == 'male' %}
                             person_4
@@ -210,21 +216,14 @@
 
     </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@latest/dist/chartjs-plugin-annotation.min.js"></script>
 <script src="{% static 'js/patients.js' %}"></script>
 <script>
-    {% if user.patients.all|length > 0 %}
-        {% with first_patient=user.patients.all|first %}
-            patient = {{ first_patient.id }};
-        {% endwith %}
-    {% else %}
-        document.getElementById('no-patient').style.display = 'block';
-        patient = null;
-    {% endif %}
+    patient = {{ user.patients.first.id }};
+    startRender();
 
-    if (patient != null) {
-        startRender();
-    }
+    changePatient(patient);
 </script>
 </body>
 </html>
