@@ -313,3 +313,69 @@ input.range::-ms-fill-upper {
 
 .pulse-canvas {
 }
+
+.your-patients-header {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.add-patient-button {
+    padding-right: 20px;
+}
+
+.add-patient-button:hover {
+    color: var(--color-primary);
+    cursor: pointer;
+}
+
+.add-patient-button:hover h2 {
+    color: var(--color-primary);
+    cursor: pointer;
+}
+
+.actions-container {
+    display: none;
+    width: 20%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.patient-data-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.patient-data {
+    width: 80%;
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    align-items: center;
+}
+
+.info {
+    margin-left: 10px
+}
+
+.edit-action:hover span {
+    cursor: pointer;
+    color: var(--color-primary);
+}
+
+.delete-action:hover span {
+    cursor: pointer;
+    color: var(--color-danger);
+}
+
+.selected-patient {
+    /*background-color: var(--color-primary-light) !important;*/
+    background: linear-gradient(90deg, var(--color-primary-light), transparent, transparent) !important;
+}

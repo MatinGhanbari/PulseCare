@@ -196,19 +196,35 @@
 
     <div class="right">
         <div class="leaves">
-            <h2>Your Patients <p style="display: inline;font-size: 1rem">({{ user.patients.all|length }})</p></h2>
+            <div class="your-patients-header">
+                <h2>Your Patients <p style="display: inline;font-size: 1rem">({{ user.patients.all|length }})</p></h2>
+                <a class="add-patient-button" href="{% url 'patient-create' %}"><h2>+</h2></a>
+            </div>
             {% for patient in user.patients.all %}
-                <div class="teacher pointer-cursor" onclick="changePatient({{ patient.id }})">
-                    <span class="material-icons-sharp">
-                        {% if patient.gender == 'male' %}
-                            person_4
-                        {% else %}
-                            person_3
-                        {% endif %}
-                    </span>
-                    <div class="info">
-                        <h3>{{ patient.first_name }}</h3>
-                        <small class="text-muted">{{ patient.last_name }}</small>
+                <div id="teacher-{{ patient.id }}" class="teacher pointer-cursor"
+                     onclick="changePatient({{ patient.id }})">
+                    <div class="patient-data-container">
+                        <div class="patient-data">
+                            <span class="material-icons-sharp">
+                                {% if patient.gender == 'male' %}
+                                    person_4
+                                {% else %}
+                                    person_3
+                                {% endif %}
+                            </span>
+                            <div class="info">
+                                <h3>{{ patient.first_name }}</h3>
+                                <small class="text-muted">{{ patient.last_name }}</small>
+                            </div>
+                        </div>
+                        <div class="actions-container">
+                            <a class="edit-action" href="{% url 'patient-update' patient.id %}">
+                                <span class="material-icons-sharp" style="font-size: 1.2rem">edit</span>
+                            </a>
+                            <a class="delete-action" onclick="deletePatient({{ patient.id }})">
+                                <span class="material-icons-sharp" style="font-size: 1.2rem">delete</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             {% endfor %}
@@ -216,8 +232,8 @@
 
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@latest/dist/chartjs-plugin-annotation.min.js"></script>
+<script src="{% static 'js/chart.js' %}"></script>
+<script src="{% static 'js/chartjs-plugin-annotation.min.js' %}"></script>
 <script src="{% static 'js/patients.js' %}"></script>
 <script>
     patient = {{ user.patients.first.id }};

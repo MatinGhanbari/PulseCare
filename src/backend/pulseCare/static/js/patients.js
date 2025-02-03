@@ -25,6 +25,18 @@ const annotators = document.getElementById("annotators");
 const signals = document.getElementById("signals");
 const notes = document.getElementById("notes");
 
+const patient_data_container = document.querySelectorAll(".patient-data-container");
+patient_data_container.forEach((container, index) => {
+    container.addEventListener('mouseover', () => {
+        const actions_container = container.querySelector('.actions-container');
+        actions_container.style.display = 'flex';
+    });
+    container.addEventListener('mouseout', () => {
+        const actions_container = container.querySelector('.actions-container');
+        actions_container.style.display = 'none';
+    });
+});
+
 const colors = [
     '#C91F37', '#3A2F7B', '#8E44AD', '#1ABC9C', '#F1C40F',
     '#E74C3C', '#3498DB', '#2ECC71', '#9B59B6', '#E67E22',
@@ -163,7 +175,6 @@ async function updateChartData(ecg) {
     });
 
     chart.update();
-    console.log("Chart updated");
 }
 
 async function renderECG(patient, frame = 0) {
@@ -239,7 +250,6 @@ async function renderECG(patient, frame = 0) {
     });
 
     window.addEventListener('resize', () => chart.resize());
-    console.log("chart rendered!")
     return chart;
 }
 
@@ -274,7 +284,7 @@ async function prevFrame() {
     if (frame <= 0) return;
     document.querySelector("#page-loader").style.display = "block";
     frame--;
-    console.log(frame);
+    // console.log(frame);
     const ecg = await fetchECGData(patient, frame);
     await updateChartData(ecg);
     document.querySelector("#page-loader").style.display = "none";
@@ -283,7 +293,7 @@ async function prevFrame() {
 async function nextFrame() {
     document.querySelector("#page-loader").style.display = "block";
     frame++;
-    console.log(frame);
+    // console.log(frame);
     const ecg = await fetchECGData(patient, frame);
     await updateChartData(ecg);
     document.querySelector("#page-loader").style.display = "none";
@@ -304,9 +314,12 @@ document.getElementById('length').addEventListener('change', () => {
 });
 
 async function changePatient(id) {
-    const ecg = await fetchECGData(patient, frame);
+    var pt = document.getElementById(`teacher-${patient}`);
+    pt.classList.remove('selected-patient');
+
     frame = 0;
     patient = id;
+    const ecg = await fetchECGData(patient, frame);
     record_length.innerHTML = secondsToHMS(ecg.record_length);
     clock_frequency.innerHTML = `${ecg.clock_frequency} ticks per second`;
     all_annotations.innerHTML = `${ecg.all_annotations} annotations`;
@@ -348,6 +361,10 @@ async function changePatient(id) {
             - ${ecg.notes[note]}<br>
         `;
     }
+
+    var pt = document.getElementById(`teacher-${patient}`);
+    pt.classList.add('selected-patient');
+
     await updateChartData(ecg);
 }
 

@@ -1,5 +1,7 @@
 import json
 
+import numpy as np
+
 
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):

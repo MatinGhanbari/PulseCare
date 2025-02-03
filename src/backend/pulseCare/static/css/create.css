@@ -1,0 +1,83 @@
+@import url('global.css');
+
+header {
+    position: relative;
+}
+
+.create-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100dvh;
+}
+
+.create-container form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: var(--border-radius-2);
+    padding: 3.5rem;
+    background-color: var(--color-white);
+    box-shadow: var(--box-shadow);
+    width: 95%;
+    max-width: 32rem;
+}
+
+.create-container form:hover {
+    box-shadow: none;
+}
+
+.create-container form input[type=password] {
+    border: none;
+    outline: none;
+    border: 1px solid var(--color-light);
+    background: transparent;
+    height: 2rem;
+    width: 100%;
+    padding: 0 .5rem;
+}
+
+.create-container form input[type=text] {
+    border: none;
+    outline: none;
+    border: 1px solid var(--color-light);
+    background: transparent;
+    height: 2rem;
+    width: 100%;
+    padding: 0 .5rem;
+}
+
+.create-container form .box {
+    padding: .5rem 0;
+}
+
+.create-container form .box p {
+    line-height: 2;
+}
+
+.create-container form h2 + p {
+    margin: .4rem 0 1.2rem 0;
+}
+
+.btn {
+    background: none;
+    border: none;
+    border: 2px solid var(--color-primary) !important;
+    border-radius: var(--border-radius-1);
+    padding: .5rem 1rem;
+    color: var(--color-white);
+    background-color: var(--color-primary);
+    cursor: pointer;
+    margin: 1rem 1.5rem 1rem 0;
+    margin-top: 1.5rem;
+}
+
+.btn:hover {
+    color: var(--color-primary);
+    background-color: transparent;
+}
+
+.error-text {
+    color: var(--color-danger);
+}

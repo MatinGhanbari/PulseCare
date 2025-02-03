@@ -2,154 +2,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <title>Update Patient</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="{% static 'favicon.ico' %}">
-    <link rel="stylesheet" href="{% static 'css/animations.css' %}">
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
-    <link rel="stylesheet" href="{% static 'css/login.css' %}">
-    <title>Update Patient</title>
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/create.css' %}">
 </head>
 <body>
-<div class="container">
-    <table border="0" style="margin: 0;padding: 0;width: 60%;">
-        <form id="patient-form">
-            {% csrf_token %}
-            <tr>
-                <td colspan="2">
-                    <p class="header-text">Edit Patient Details</p>
-                </td>
-            </tr>
-            <div class="form-body">
-                <tr>
-                    <td colspan="2">
-                        <p class="sub-text">Update the patient information and then click on the submit button.</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="label-td" colspan="2">
-                        <label for="firstname" class="form-label">First Name: </label>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="label-td" colspan="2">
-                        <input type="text" id="firstname" class="input-text" placeholder="First Name"
-                               value="{{ patient.first_name }}"
-                               required>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="label-td" colspan="2">
-                        <label for="lastname" class="form-label">Last Name: </label>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="label-td" colspan="2">
-                        <input type="text" id="lastname" class="input-text" placeholder="Last Name"
-                               value="{{ patient.last_name }}"
-                               required>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="label-td" width="50%">
-                        <label for="age" class="form-label">age: </label>
-                    </td>
-                    <td class="label-td" width="50%">
-                        <label for="gender" class="form-label">Gender:</label>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="label-td" width="50%">
-                        <input type="text" id="age" class="input-text" placeholder="age" value="{{ patient.age }}"
-                               required>
-                    </td>
-                    <td class="label-td" width="50%">
-                        <select id="gender" class="input-text" required>
-                            <option value="male" {% if patient.gender == 'male' %} selected {% endif %}>Male
-                            </option>
-                            <option value="female" {% if patient.gender == 'female' %} selected {% endif %}>Female
-                            </option>
-                            <option value="other" {% if patient.gender == 'other' %} selected {% endif %}>Other
-                            </option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="label-td" colspan="2">
-                        <label for="files" class="form-label">Heart ECG data:</label>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="label-td" colspan="2">
-                        <input type="file" id="files" class="input-text" accept=".dat,.hea,.xyz" multiple required>
-                    </td>
-                </tr>
-                <tr>
-                    <td><br></td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        <button class="login-btn btn-primary btn">Update</button>
-                    </td>
-                </tr>
-            </div>
-            <tr>
-                <td colspan="2">
-                    <a href="{% url 'patients' %}" class="hover-link1 non-style-link">Back</a>
-                    <br><br>
-                </td>
-            </tr>
-        </form>
-    </table>
+<div class="create-container">
+    <form action="">
+        <h2>Edit Patient Details</h2>
+        <p class="text-muted">Update the patient information and then click on the submit button.</p>
+        <input hidden type="password" id="patient_id" value="{{ patient.id }}">
+        <div class="box">
+            <p class="text-muted">FirstName: </p>
+            <input type="text" id="firstname" value="{{ patient.first_name }}" required>
+        </div>
+        <div class="box">
+            <p class="text-muted">LastName:</p>
+            <input type="text" id="lastname" value="{{ patient.last_name }}" required>
+        </div>
+        <div class="box">
+            <p class="text-muted">Age:</p>
+            <input type="text" id="age" value="{{ patient.age }}" required>
+        </div>
+        <div class="box">
+            <p class="text-muted">Gender:</p>
+            <select id="gender" class="input-text" required>
+                <option value="male" {% if patient.gender == 'male' %} selected {% endif %}>Male
+                </option>
+                <option value="female" {% if patient.gender == 'female' %} selected {% endif %}>Female
+                </option>
+                <option value="other" {% if patient.gender == 'other' %} selected {% endif %}>Other
+                </option>
+            </select>
+        </div>
+        <div class="box">
+            <p class="text-muted">Heart ECG data:</p>
+            <input type="file" id="files" class="input-text" multiple required>
+        </div>
+        <div class="box">
+            <p id="error" class="text-muted error-text" style="display: none"></p>
+        </div>
+        <div class="button">
+            <input type="submit" value="Create" class="btn">
+            <a class="text-muted pointer-cursor" onclick="clearForm()">Clear</a>
+        </div>
+        <div>
+            <br>
+        </div>
+        <a href="{% url 'patients' %}"><p>Back</p></a>
+    </form>
 </div>
-<script>
-    const form = document.querySelector('form');
-    form.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            form.submit();
-        }
-    });
-</script>
-<script>
-    document.getElementById('patient-form').addEventListener('submit', function (event) {
-        event.preventDefault(); // Prevent the default form submission
-
-        const firstname = document.getElementById('firstname').value;
-        const lastname = document.getElementById('lastname').value;
-        const age = document.getElementById('age').value;
-        const gender = document.getElementById('gender').value;
-        const files = document.getElementById('files').files;
-
-        const formData = new FormData();
-        formData.append('firstname', firstname);
-        formData.append('lastname', lastname);
-        formData.append('age', age);
-        formData.append('gender', gender);
-        for (let i = 0; i < files.length; i++) {
-            formData.append('files', files[i]);
-        }
-
-        fetch('/api/patients/{{ patient.id }}/', {
-            method: 'PUT',
-            headers: {
-                'Authorization': `${localStorage.getItem('token')}`
-            },
-            body: formData,
-        })
-            .then(response => {
-                if (response.ok) {
-                    window.open('{% url 'patients' %}', '_self');
-                } else {
-                    alert(response.json());
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
-            });
-    });
-</script>
+<script src="{% static 'js/patients/edit.js' %}"></script>
 </body>
 </html>
