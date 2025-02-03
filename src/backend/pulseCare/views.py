@@ -18,7 +18,6 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .data_access import *
-from .encoders import NumpyEncoder
 from .models import User, Patient
 
 
@@ -125,6 +124,68 @@ class PatientUpdateView(APIViewWrapper):
 
 
 class PatientDetailView(APIViewWrapper):
+    def get(self, request, pk):
+        patient = pk
+
+        redis_key = f"{patient}:details"
+        try:
+            cached_data = redis_client.get(redis_key)
+            if cached_data:
+                return Response(json.loads(cached_data))
+        except ConnectionError as error:
+            print(f"Redis is unavailable! Message: {str(error)}")
+
+        directory_path = os.path.join('datasets', 'patients', str(patient))
+        files = [f for f in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, f))]
+        record_path = str(os.path.join(directory_path, files[0].split(".")[0]))
+
+        record = wfdb.rdrecord(record_path)
+        ann = wfdb.rdann(record_path, 'atr')
+
+        annotations_count = ann.ann_len
+        record_length = int(round(record.sig_len / record.fs, 0))
+        clock_frequency = record.fs
+
+        for (i, note) in enumerate(ann.aux_note):
+            if note != "":
+                ann.symbol[i] = note.replace('\x00', '')
+        annotations_symbols = list(set(ann.symbol))
+        annotations = {}
+        for sym in annotations_symbols:
+            annotations[sym] = [i for (i, n) in enumerate(ann.symbol) if n == sym]
+        for i, an in enumerate(annotations):
+            annotations[an] = len(annotations[an])
+        annotations = sorted(annotations.items(), key=lambda x: x[1], reverse=True)
+        signals = {}
+        for i, sig in enumerate(record.sig_name):
+            signals[sig] = (f"{record.samps_per_frame[i]} tick per sample; "
+                            f"{record.adc_gain[i]} adu/mV; "
+                            f"{record.adc_res[i]}-bit ADC, zero at {record.adc_zero[i]}; "
+                            f"baseline is {record.baseline[i]}")
+        notes = record.comments
+        patient_obj = Patient.objects.get(id=patient)
+
+        response = {
+            'first_name': patient_obj.first_name,
+            'last_name': patient_obj.last_name,
+            'gender': patient_obj.gender,
+            'age': patient_obj.age,
+            'pulse_details': {
+                'record_length': record_length,
+                'clock_frequency': clock_frequency,
+                'all_annotations': annotations_count,
+                'annotations': annotations,
+                'signals': signals,
+                'notes': notes,
+            },
+        }
+
+        try:
+            redis_client.set(redis_key, json.dumps(response))
+        except ConnectionError as error:
+            print(f"Redis is unavailable! Message: {str(error)}")
+        return Response(response)
+
     def put(self, request, pk):
         patient = get_object_or_404(Patient, pk=pk, doctor=request.user)
 
@@ -142,7 +203,7 @@ class PatientDetailView(APIViewWrapper):
 
         directory_path = os.path.join('datasets', 'patients', str(patient.id))
 
-        prefix = f"ecg_data:{pk}"
+        prefix = f"{pk}"
         remove_keys_with_prefix(redis_client, prefix)
         shutil.rmtree(directory_path)
 
@@ -160,7 +221,7 @@ class PatientDetailView(APIViewWrapper):
         patient = get_object_or_404(Patient, pk=pk, doctor=request.user)
         patient.delete()
 
-        prefix = f"ecg_data:{patient}"
+        prefix = f"{patient}"
         remove_keys_with_prefix(redis_client, prefix)
 
         return Response({"message": "Deleted successfully!"})
@@ -214,7 +275,7 @@ class LoginView(APIView):
 #         patient = str(request.GET.get('patient'))
 #
 #         # Generate a unique key based on request parameters
-#         redis_key = f"ecg_data:{patient}:{start}:{length}:{base_rate}"
+#         redis_key = f"{patient}:ecg:{start}:{length}:{base_rate}"
 #
 #         # Check if data exists in Redis
 #         try:
@@ -310,102 +371,48 @@ class LoginView(APIView):
 
 class ECGView(APIViewWrapper):
     def get(self, request):
-        base_rate = 1000
-
         start = int(request.GET.get('start', 0))
         length = int(request.GET.get('length', 5))
         patient = str(request.GET.get('patient'))
 
-        # Generate a unique key based on request parameters
-        redis_key = f"ecg_data:{patient}:{start}:{length}:{base_rate}"
-
-        # Check if data exists in Redis
-        try:
-            cached_data = redis_client.get(redis_key)
-            if cached_data:
-                return Response(json.loads(cached_data))
-        except ConnectionError as error:
-            print(f"Redis is unavailable! Message: {str(error)}")
+        # redis_key = f"{patient}:ecg:{start}:{length}:{base_rate}"
+        #
+        # # Check if data exists in Redis
+        # try:
+        #     cached_data = redis_client.get(redis_key)
+        #     if cached_data:
+        #         return Response(json.loads(cached_data))
+        # except ConnectionError as error:
+        #     print(f"Redis is unavailable! Message: {str(error)}")
 
         directory_path = os.path.join('datasets', 'patients', str(patient))
         files = [f for f in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, f))]
         record_path = str(os.path.join(directory_path, files[0].split(".")[0]))
 
-        record = wfdb.rdrecord(record_path)
-        ann = wfdb.rdann(record_path, 'atr')
+        head = wfdb.rdheader(record_path)
+        clock_frequency = head.fs
+        sampfrom = start * clock_frequency
+        sampto = (length + start) * clock_frequency
 
-        annotations_count = ann.ann_len
-        record_length = int(round(record.sig_len / record.fs, 0))
-        clock_frequency = record.fs
+        try:
+            record = wfdb.rdrecord(record_path, sampfrom=sampfrom, sampto=sampto, channels=[0])
+        except ValueError as e:
+            if 'sampfrom must be shorter than the signal length' in str(e):
+                return Response({'error': 'sampfrom must be shorter than the signal length'},
+                                status=status.HTTP_400_BAD_REQUEST)
 
-        for (i, note) in enumerate(ann.aux_note):
-            if note != "":
-                ann.symbol[i] = note.replace('\x00', '')
-        annotations_symbols = list(set(ann.symbol))
-        annotations = {}
-        for sym in annotations_symbols:
-            annotations[sym] = [i for (i, n) in enumerate(ann.symbol) if n == sym]
-        for i, an in enumerate(annotations):
-            annotations[an] = len(annotations[an])
-        annotations = sorted(annotations.items(), key=lambda x: x[1], reverse=True)
-        signals = {}
-        for i, sig in enumerate(record.sig_name):
-            signals[sig] = (f"{record.samps_per_frame[i]} tick per sample; "
-                            f"{record.adc_gain[i]} adu/mV; "
-                            f"{record.adc_res[i]}-bit ADC, zero at {record.adc_zero[i]}; "
-                            f"baseline is {record.baseline[i]}")
-        notes = record.comments
+        time_to_add = datetime.timedelta(seconds=start)
 
-        # Delineate the ECG signal
-        sig_start = start * clock_frequency
-        sig_end = (length + start) * clock_frequency
-        # if length > 5 else (5 + start) * clock_frequency
-        ecg_signal = record.p_signal[sig_start:sig_end, 0]
-
-        # rpeaks = {}
-        # waves_peak = {}
-        # try:
-        #     _, rpeaks = nk.ecg_peaks(ecg_signal, sampling_rate=record.fs)
-        #     _, waves_peak = nk.ecg_delineate(ecg_signal, rpeaks, sampling_rate=record.fs, method="peak")
-        # except Exception as e:
-        #     print(f"Error with patient {patient}, start: {start}, length: {length}: " + str(e))
-        #     waves_peak = {'ECG_P_Peaks': [], 'ECG_Q_Peaks': [], 'ECG_S_Peaks': [], 'ECG_T_Peaks': []}
-
-        # ecg_signal = ecg_signal[sig_start:(length + start) * clock_frequency
-        #                         :int((length + start) * clock_frequency / base_rate)
-        #                         if (length + start) * clock_frequency > base_rate else 1]
-
-        ecg_signal = record.p_signal[sig_start:sig_end:int((length + start) * clock_frequency / base_rate)
-        if (length + start) * clock_frequency > base_rate else 1, 0]
+        ecg = [[int((record.get_elapsed_time(i) + time_to_add).total_seconds() * 1000), x[0]]
+               for i, x in enumerate(record.p_signal)]
 
         response = {
-            'ecg_data': ecg_signal,
-            # 'ECG_P_Peaks': [num - sig_start for num in waves_peak['ECG_P_Peaks'] if sig_start < num < sig_end] if
-            # waves_peak['ECG_P_Peaks'] else [],
-            # 'ECG_Q_Peaks': [num - sig_start for num in waves_peak['ECG_Q_Peaks'] if sig_start < num < sig_end] if
-            # waves_peak['ECG_Q_Peaks'] else [],
-            # 'ECG_R_Peaks': [num - sig_start for num in rpeaks['ECG_R_Peaks'] if sig_start < num < sig_end],
-            # 'ECG_S_Peaks': [num - sig_start for num in waves_peak['ECG_S_Peaks'] if sig_start < num < sig_end] if
-            # waves_peak['ECG_S_Peaks'] else [],
-            # 'ECG_T_Peaks': [num - sig_start for num in waves_peak['ECG_T_Peaks'] if sig_start < num < sig_end] if
-            # waves_peak['ECG_T_Peaks'] else [],
-            'record_length': record_length,
-            'clock_frequency': clock_frequency,
-            'all_annotations': annotations_count,
-            'annotations': annotations,
-            'signals': signals,
-            'notes': notes,
-            'patient': {
-                'first_name': Patient.objects.get(id=patient).first_name,
-                'last_name': Patient.objects.get(id=patient).last_name,
-                'gender': Patient.objects.get(id=patient).gender,
-                'age': Patient.objects.get(id=patient).age,
-            }
+            'ecg_data': ecg,
         }
 
         # Store the response data in Redis
-        try:
-            redis_client.set(redis_key, json.dumps(response, cls=NumpyEncoder))
-        except ConnectionError as error:
-            print(f"Redis is unavailable! Message: {str(error)}")
+        # try:
+        #     redis_client.set(redis_key, json.dumps(response, cls=NumpyEncoder))
+        # except ConnectionError as error:
+        #     print(f"Redis is unavailable! Message: {str(error)}")
         return Response(response)

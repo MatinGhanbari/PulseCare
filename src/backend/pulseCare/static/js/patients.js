@@ -118,6 +118,23 @@ function deletePatient(patient_id) {
         });
 }
 
+async function fetchPatientDetailsData(patient) {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`http://127.0.0.1:8000/api/patients/${patient}?format=json`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `${token}`
+        },
+        credentials: 'include'
+    });
+    if (!response.ok) {
+        alert("Error on fetching patient details");
+        return;
+    }
+    return await response.json();
+}
+
 async function fetchECGData(patient, frame = 0) {
     var frame_size = document.getElementById('length').value;
     const start = frame * frame_size;
@@ -132,7 +149,7 @@ async function fetchECGData(patient, frame = 0) {
         credentials: 'include'
     });
     if (!response.ok) {
-        alert("Error on parsing the dataset");
+        console.log("An error has occurred during processing.");
         return;
     }
     return await response.json();
@@ -161,18 +178,21 @@ async function updateChartData(ecg) {
         return;
 
     // Update labels and datasets
-    chart.data.labels = Array.from({length: ecg_data.length}, (_, i) => i);
-    chart.data.datasets.forEach((dataset, index) => {
-        // if (index < 5) { // For peak datasets
-        // if (length <= 11) {
-        //     dataset.data = peaks[Object.keys(peaks)[index]];
-        // } else {
-        //     dataset.data = [];
-        // }
-        // } else { // For ECG signal dataset
-        dataset.data = ecg_data;
-        // }
-    });
+    // chart.data.labels = Array.from({length: ecg_data.length}, (_, i) => i);
+    // chart.data.datasets.forEach((dataset, index) => {
+    //     // if (index < 5) { // For peak datasets
+    //     // if (length <= 11) {
+    //     //     dataset.data = peaks[Object.keys(peaks)[index]];
+    //     // } else {
+    //     //     dataset.data = [];
+    //     // }
+    //     // } else { // For ECG signal dataset
+    //     dataset.data = ecg_data;
+    //     // }
+    // });
+
+    chart.data.labels = ecg_data.map(x => x[0]);
+    chart.data.datasets[0].data = ecg_data.map(x => x[1]);
 
     chart.update();
 }
@@ -189,13 +209,9 @@ async function renderECG(patient, frame = 0) {
     chart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: Array.from({length: ecg_data.length}, (_, i) => i),
+            // labels: Array.from({length: ecg_data.length}, (_, i) => i),
+            labels: ecg_data.map(x => x[0]),
             datasets: [
-                // {type: 'bubble', label: 'P Peak', data: peaks.ECG_P_Peaks, borderColor: '#1f77b4', pointRadius: 8},
-                // {type: 'bubble', label: 'Q Peak', data: peaks.ECG_Q_Peaks, borderColor: '#ff7f0e', pointRadius: 8},
-                // {type: 'bubble', label: 'R Peak', data: peaks.ECG_R_Peaks, borderColor: '#d62728', pointRadius: 8},
-                // {type: 'bubble', label: 'S Peak', data: peaks.ECG_S_Peaks, borderColor: '#2ca02c', pointRadius: 8},
-                // {type: 'bubble', label: 'T Peak', data: peaks.ECG_T_Peaks, borderColor: '#9467bd', pointRadius: 8},
                 {
                     type: 'line',
                     label: 'ECG',
@@ -207,17 +223,39 @@ async function renderECG(patient, frame = 0) {
                     pointRadius: 0.2,
                     fill: false
                 },
+                // {type: 'bubble', label: 'P Peak', data: peaks.ECG_P_Peaks, borderColor: '#1f77b4', pointRadius: 8},
+                // {type: 'bubble', label: 'Q Peak', data: peaks.ECG_Q_Peaks, borderColor: '#ff7f0e', pointRadius: 8},
+                // {type: 'bubble', label: 'R Peak', data: peaks.ECG_R_Peaks, borderColor: '#d62728', pointRadius: 8},
+                // {type: 'bubble', label: 'S Peak', data: peaks.ECG_S_Peaks, borderColor: '#2ca02c', pointRadius: 8},
+                // {type: 'bubble', label: 'T Peak', data: peaks.ECG_T_Peaks, borderColor: '#9467bd', pointRadius: 8},
             ],
         },
         options: {
             responsive: true,
             scales: {
-                // x: {title: {display: true, text: 'Samples (s)'}},
-                y: {title: {display: true, text: 'Amplitude (mV)'}}
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Time (ms)',
+                    }
+                    , ticks: {
+                        maxTicksLimit: 10,
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Amplitude (mV)'
+                    }
+                }
             },
             plugins: {
                 legend: {
-                    display: false
+                    display: false,
+                    position: 'right',
+                    align: 'center',
+                    fullSize: true
+
                 },
                 // annotation: {
                 //     annotations: {
@@ -294,8 +332,12 @@ async function nextFrame() {
     document.querySelector("#page-loader").style.display = "block";
     frame++;
     // console.log(frame);
-    const ecg = await fetchECGData(patient, frame);
-    await updateChartData(ecg);
+    try {
+        const ecg = await fetchECGData(patient, frame);
+        await updateChartData(ecg);
+    } catch (e) {
+        frame--;
+    }
     document.querySelector("#page-loader").style.display = "none";
 }
 
@@ -319,22 +361,23 @@ async function changePatient(id) {
 
     frame = 0;
     patient = id;
-    const ecg = await fetchECGData(patient, frame);
-    record_length.innerHTML = secondsToHMS(ecg.record_length);
-    clock_frequency.innerHTML = `${ecg.clock_frequency} ticks per second`;
-    all_annotations.innerHTML = `${ecg.all_annotations} annotations`;
-    cur_patient_gender.innerHTML = ecg.patient.gender;
-    cur_patient_age.innerHTML = ecg.patient.age;
-    cur_patient_firstname.innerHTML = ecg.patient.first_name;
-    cur_patient_lastname.innerHTML = ecg.patient.last_name;
-    if (ecg.patient.gender === 'male') {
+
+    const patient_details = await fetchPatientDetailsData(patient);
+    record_length.innerHTML = secondsToHMS(patient_details.pulse_details.record_length);
+    clock_frequency.innerHTML = `${patient_details.pulse_details.clock_frequency} ticks per second`;
+    all_annotations.innerHTML = `${patient_details.pulse_details.all_annotations} annotations`;
+    cur_patient_gender.innerHTML = patient_details.gender;
+    cur_patient_age.innerHTML = patient_details.age;
+    cur_patient_firstname.innerHTML = patient_details.first_name;
+    cur_patient_lastname.innerHTML = patient_details.last_name;
+    if (patient_details.gender === 'male') {
         cur_patient_img.innerHTML = 'person_4';
     } else {
         cur_patient_img.innerHTML = 'person_3';
     }
     annotators.innerHTML = ``;
-    for (const key in ecg.annotations) {
-        let annotation = ecg.annotations[key];
+    for (const key in patient_details.pulse_details.annotations) {
+        let annotation = patient_details.pulse_details.annotations[key];
         var ann_name = annotation[0].padEnd(10, ' ');
         annotators.innerHTML += `
         <h4>${ann_name}:
@@ -345,9 +388,9 @@ async function changePatient(id) {
         `;
     }
     signals.innerHTML = ``;
-    for (const ecgKey in ecg.signals) {
-        let key = ecgKey;
-        let value = ecg.signals[key];
+    for (const patient_detailsKey in patient_details.pulse_details.signals) {
+        let key = patient_detailsKey;
+        let value = patient_details.pulse_details.signals[key];
         signals.innerHTML += `
         <h4>${key}</h4>
         <p style="display: inline;width: 100%; right: 0;">
@@ -356,15 +399,16 @@ async function changePatient(id) {
         `;
     }
     notes.innerHTML = ``;
-    for (const note in ecg.notes) {
+    for (const note in patient_details.pulse_details.notes) {
         notes.innerHTML += `
-            - ${ecg.notes[note]}<br>
+            - ${patient_details.pulse_details.notes[note]}<br>
         `;
     }
 
     var pt = document.getElementById(`teacher-${patient}`);
     pt.classList.add('selected-patient');
 
+    const ecg = await fetchECGData(patient, frame);
     await updateChartData(ecg);
 }
 
