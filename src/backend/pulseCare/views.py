@@ -18,6 +18,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .data_access import *
+from .encoders import NumpyEncoder
 from .models import User, Patient
 
 
@@ -376,15 +377,15 @@ class ECGView(APIViewWrapper):
         selected_time = int(request.GET.get('selected-time', -1))
         patient = str(request.GET.get('patient'))
 
-        # redis_key = f"{patient}:ecg:{start}:{length}:{base_rate}"
-        #
-        # # Check if data exists in Redis
-        # try:
-        #     cached_data = redis_client.get(redis_key)
-        #     if cached_data:
-        #         return Response(json.loads(cached_data))
-        # except ConnectionError as error:
-        #     print(f"Redis is unavailable! Message: {str(error)}")
+        redis_key = f"{patient}:ecg:{start}:{length}"
+
+        # Check if data exists in Redis
+        try:
+            cached_data = redis_client.get(redis_key)
+            if cached_data:
+                return Response(json.loads(cached_data))
+        except ConnectionError as error:
+            print(f"Redis is unavailable! Message: {str(error)}")
 
         directory_path = os.path.join('datasets', 'patients', str(patient))
         files = [f for f in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, f))]
@@ -417,8 +418,8 @@ class ECGView(APIViewWrapper):
         }
 
         # Store the response data in Redis
-        # try:
-        #     redis_client.set(redis_key, json.dumps(response, cls=NumpyEncoder))
-        # except ConnectionError as error:
-        #     print(f"Redis is unavailable! Message: {str(error)}")
+        try:
+            redis_client.set(redis_key, json.dumps(response, cls=NumpyEncoder))
+        except ConnectionError as error:
+            print(f"Redis is unavailable! Message: {str(error)}")
         return Response(response)
