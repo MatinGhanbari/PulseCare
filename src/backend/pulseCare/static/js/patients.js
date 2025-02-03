@@ -25,6 +25,7 @@ const annotators = document.getElementById("annotators");
 const signals = document.getElementById("signals");
 const notes = document.getElementById("notes");
 
+
 const patient_data_container = document.querySelectorAll(".patient-data-container");
 patient_data_container.forEach((container, index) => {
     container.addEventListener('mouseover', () => {
@@ -37,12 +38,7 @@ patient_data_container.forEach((container, index) => {
     });
 });
 
-const colors = [
-    '#C91F37', '#3A2F7B', '#8E44AD', '#1ABC9C', '#F1C40F',
-    '#E74C3C', '#3498DB', '#2ECC71', '#9B59B6', '#E67E22',
-    '#16A085', '#D35400', '#2980B9', '#27AE60', '#8E44AD',
-    '#F39C12', '#C0392B', '#7F8C8D', '#2C3E50', '#BDC3C7'
-];
+const colors = ['#C91F37', '#3A2F7B', '#8E44AD', '#1ABC9C', '#F1C40F', '#E74C3C', '#3498DB', '#2ECC71', '#9B59B6', '#E67E22', '#16A085', '#D35400', '#2980B9', '#27AE60', '#8E44AD', '#F39C12', '#C0392B', '#7F8C8D', '#2C3E50', '#BDC3C7'];
 
 perv_frame_btn.addEventListener('click', () => prevFrame());
 next_frame_btn.addEventListener('click', () => nextFrame());
@@ -69,10 +65,7 @@ function updateDateTime() {
         // year: 'numeric',
         // month: 'long',
         // day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
     };
     datetime.innerHTML = now.toLocaleString('en-US', options);
 }
@@ -100,8 +93,7 @@ function logoutUser() {
 
 function deletePatient(patient_id) {
     fetch(`/api/patients/${patient_id}/`, {
-        method: 'DELETE',
-        headers: {
+        method: 'DELETE', headers: {
             'Authorization': `${localStorage.getItem('token')}`
         },
     })
@@ -121,12 +113,9 @@ function deletePatient(patient_id) {
 async function fetchPatientDetailsData(patient) {
     const token = localStorage.getItem('token');
     const response = await fetch(`http://127.0.0.1:8000/api/patients/${patient}?format=json`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `${token}`
-        },
-        credentials: 'include'
+        method: 'GET', headers: {
+            'Content-Type': 'application/json', 'Authorization': `${token}`
+        }, credentials: 'include'
     });
     if (!response.ok) {
         alert("Error on fetching patient details");
@@ -137,16 +126,13 @@ async function fetchPatientDetailsData(patient) {
 
 async function fetchECGData(patient, frame = 0) {
     var frame_size = document.getElementById('length').value;
-    const start = frame * frame_size;
+    const start = Math.floor(frame * frame_size);
     const token = localStorage.getItem('token');
 
     const response = await fetch(`http://127.0.0.1:8000/api/ecg?format=json&patient=${patient}&start=${start}&length=${frame_size}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `${token}`
-        },
-        credentials: 'include'
+        method: 'GET', headers: {
+            'Content-Type': 'application/json', 'Authorization': `${token}`
+        }, credentials: 'include'
     });
     if (!response.ok) {
         console.log("An error has occurred during processing.");
@@ -162,20 +148,17 @@ function processECGData(ecg) {
     //     return acc;
     // }, {});
     return {
-        ecg_data,
-        // peaks
+        ecg_data, // peaks
     };
 }
 
 async function updateChartData(ecg) {
     const {
-        ecg_data,
-        // peaks
+        ecg_data, // peaks
     } = processECGData(ecg);
     let length = document.getElementById('length').value;
 
-    if (chart == null)
-        return;
+    if (chart == null) return;
 
     // Update labels and datasets
     // chart.data.labels = Array.from({length: ecg_data.length}, (_, i) => i);
@@ -200,65 +183,49 @@ async function updateChartData(ecg) {
 async function renderECG(patient, frame = 0) {
     const ecg = await fetchECGData(patient, frame);
     const {
-        ecg_data,
-        // peaks
+        ecg_data, // peaks
     } = processECGData(ecg);
 
     const ctx = document.getElementById('ecgChart').getContext('2d');
 
     chart = new Chart(ctx, {
-        type: 'line',
-        data: {
+        type: 'line', data: {
             // labels: Array.from({length: ecg_data.length}, (_, i) => i),
-            labels: ecg_data.map(x => x[0]),
-            datasets: [
-                {
-                    type: 'line',
-                    label: 'ECG',
-                    data: ecg_data,
-                    borderColor: 'rgb(75, 192, 192)',
-                    backgroundColor: 'rgba(100,100,100,0.27)',
-                    tension: 0.2,
-                    pointStyle: 'circle',
-                    pointRadius: 0.2,
-                    fill: false
-                },
-                // {type: 'bubble', label: 'P Peak', data: peaks.ECG_P_Peaks, borderColor: '#1f77b4', pointRadius: 8},
+            labels: ecg_data.map(x => x[0]), datasets: [{
+                type: 'line',
+                label: 'ECG',
+                data: ecg_data,
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(100,100,100,0.27)',
+                tension: 0.2,
+                pointStyle: 'circle',
+                pointRadius: 0.2,
+                fill: false
+            }, // {type: 'bubble', label: 'P Peak', data: peaks.ECG_P_Peaks, borderColor: '#1f77b4', pointRadius: 8},
                 // {type: 'bubble', label: 'Q Peak', data: peaks.ECG_Q_Peaks, borderColor: '#ff7f0e', pointRadius: 8},
                 // {type: 'bubble', label: 'R Peak', data: peaks.ECG_R_Peaks, borderColor: '#d62728', pointRadius: 8},
                 // {type: 'bubble', label: 'S Peak', data: peaks.ECG_S_Peaks, borderColor: '#2ca02c', pointRadius: 8},
                 // {type: 'bubble', label: 'T Peak', data: peaks.ECG_T_Peaks, borderColor: '#9467bd', pointRadius: 8},
             ],
-        },
-        options: {
-            responsive: true,
-            scales: {
+        }, options: {
+            responsive: true, scales: {
                 x: {
                     type: 'linear',
 
                     title: {
-                        display: true,
-                        text: 'Time (ms)',
-                    }
-                    , ticks: {
-                        maxTicksLimit: 11,
-                        bounds: 'ticks', // Include bounds for the ticks
+                        display: true, text: 'Time (ms)',
+                    }, ticks: {
+                        maxTicksLimit: 11, bounds: 'ticks', // Include bounds for the ticks
                         includeBounds: true // Ensure the first and last ticks are included
                     }
-                },
-                y: {
+                }, y: {
                     title: {
-                        display: true,
-                        text: 'Amplitude (mV)'
+                        display: true, text: 'Amplitude (mV)'
                     }
                 }
-            },
-            plugins: {
+            }, plugins: {
                 legend: {
-                    display: false,
-                    position: 'right',
-                    align: 'center',
-                    fullSize: true
+                    display: false, position: 'right', align: 'center', fullSize: true
 
                 },
             }
@@ -401,12 +368,59 @@ function secondsToHMS(seconds) {
     const secs = seconds % 60;
 
     // Format the output to always have two digits
-    return [
-        String(hours).padStart(2, '0'),
-        String(minutes).padStart(2, '0'),
-        String(secs).padStart(2, '0')
-    ].join(':');
+    return [String(hours).padStart(2, '0'), String(minutes).padStart(2, '0'), String(secs).padStart(2, '0')].join(':');
 }
 
 setInterval(updateDateTime, 1000);
 updateDateTime();
+
+
+const time_h = document.getElementById("time-h");
+const time_m = document.getElementById("time-m");
+const time_s = document.getElementById("time-s");
+const time_h_inc = document.getElementById("time-h-inc");
+const time_h_dec = document.getElementById("time-h-dec");
+const time_m_inc = document.getElementById("time-m-inc");
+const time_m_dec = document.getElementById("time-m-dec");
+const time_s_inc = document.getElementById("time-s-inc");
+const time_s_dec = document.getElementById("time-s-dec");
+
+async function UpdateSeekTime(h, m, s) {
+    time_h.style.color = '';
+    time_m.style.color = '';
+    time_s.style.color = '';
+
+    h = Number(h);
+    m = Number(m);
+    s = Number(s);
+    if (h < 0) {
+        h = h + 24;
+    }
+    if (m < 0) {
+        m = m + 60;
+    }
+    if (s < 0) {
+        s = s + 60;
+    }
+    time_h.innerHTML = String(h % 24).padStart(2, '0');
+    time_m.innerHTML = String(m % 60).padStart(2, '0');
+    time_s.innerHTML = String(s % 60).padStart(2, '0');
+
+    try {
+        var frame_size = document.getElementById('length').value;
+        frame = (s + (m * 60) + (h * 3600)) / Number(frame_size);
+        const ecg = await fetchECGData(patient, Math.floor(frame));
+        await updateChartData(ecg);
+    } catch (e) {
+        time_h.style.color = 'var(--color-danger)';
+        time_m.style.color = 'var(--color-danger)';
+        time_s.style.color = 'var(--color-danger)';
+    }
+}
+
+time_h_inc.addEventListener('click', () => UpdateSeekTime(Number(time_h.innerHTML) + 1, time_m.innerHTML, time_s.innerHTML));
+time_h_dec.addEventListener('click', () => UpdateSeekTime(Number(time_h.innerHTML) - 1, time_m.innerHTML, time_s.innerHTML));
+time_m_inc.addEventListener('click', () => UpdateSeekTime(time_h.innerHTML, Number(time_m.innerHTML) + 1, time_s.innerHTML));
+time_m_dec.addEventListener('click', () => UpdateSeekTime(time_h.innerHTML, Number(time_m.innerHTML) - 1, time_s.innerHTML));
+time_s_inc.addEventListener('click', () => UpdateSeekTime(time_h.innerHTML, time_m.innerHTML, Number(time_s.innerHTML) + 1));
+time_s_dec.addEventListener('click', () => UpdateSeekTime(time_h.innerHTML, time_m.innerHTML, Number(time_s.innerHTML) - 1));

@@ -57,7 +57,7 @@
 
 main .control-subjects {
     display: grid;
-    grid-template-columns: 4fr 1fr;
+    grid-template-columns: 2fr 1fr 2fr 1fr;
     gap: 1.6rem;
 }
 
@@ -378,4 +378,23 @@ input.range::-ms-fill-upper {
 .selected-patient {
     /*background-color: var(--color-primary-light) !important;*/
     background: linear-gradient(90deg, var(--color-primary-light), transparent, transparent) !important;
+}
+
+.flex-row-between {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    align-content: center;
+    height: 100%;
+}
+
+.margin-0 {
+    margin: 0 !important;
+}
+
+.material-icons-sharp:hover small {
+    color: var(--color-primary);
 }
