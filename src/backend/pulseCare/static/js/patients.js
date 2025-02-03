@@ -234,12 +234,16 @@ async function renderECG(patient, frame = 0) {
             responsive: true,
             scales: {
                 x: {
+                    type: 'linear',
+
                     title: {
                         display: true,
                         text: 'Time (ms)',
                     }
                     , ticks: {
-                        maxTicksLimit: 10,
+                        maxTicksLimit: 11,
+                        bounds: 'ticks', // Include bounds for the ticks
+                        includeBounds: true // Ensure the first and last ticks are included
                     }
                 },
                 y: {
@@ -257,35 +261,13 @@ async function renderECG(patient, frame = 0) {
                     fullSize: true
 
                 },
-                // annotation: {
-                //     annotations: {
-                //         annotations: {
-                //             label1: {
-                //                 type: 'line',
-                //                 backgroundColor: 'rgba(0,0,0,0.2)',
-                //                 borderRadius: 6,
-                //                 borderWidth: 0,
-                //                 callout: {
-                //                     display: true
-                //                 },
-                //                 color: ['black,', 'black', 'green'],
-                //                 content: ['March', 'is', 'annotated'],
-                //                 font: [{size: 16, weight: 'bold'}, {family: 'courier'}],
-                //                 position: {
-                //                     x: 'center',
-                //                     y: 'end'
-                //                 },
-                //                 xValue: 'March',
-                //                 yAdjust: (ctx) => yOffset(ctx, 'March'),
-                //                 yValue: (ctx) => yValue(ctx, 'March')
-                //             }
-                //         }
-                //     }
-                // }
             }
         },
 
     });
+
+    // var l = chart.axis.getLabels();
+    // chart.axis.ticks.push({value: chart.axis.max, label: l[chart.axis.max]});
 
     window.addEventListener('resize', () => chart.resize());
     return chart;

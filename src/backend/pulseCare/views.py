@@ -373,6 +373,7 @@ class ECGView(APIViewWrapper):
     def get(self, request):
         start = int(request.GET.get('start', 0))
         length = int(request.GET.get('length', 5))
+        selected_time = int(request.GET.get('selected-time', -1))
         patient = str(request.GET.get('patient'))
 
         # redis_key = f"{patient}:ecg:{start}:{length}:{base_rate}"
@@ -391,11 +392,16 @@ class ECGView(APIViewWrapper):
 
         head = wfdb.rdheader(record_path)
         clock_frequency = head.fs
+
+        if selected_time > 0:
+            temp = selected_time - (length / 2)
+            start = temp if temp > 0 else 0
+
         sampfrom = start * clock_frequency
         sampto = (length + start) * clock_frequency
 
         try:
-            record = wfdb.rdrecord(record_path, sampfrom=sampfrom, sampto=sampto, channels=[0])
+            record = wfdb.rdrecord(record_path, sampfrom=sampfrom, sampto=sampto + 1, channels=[0])
         except ValueError as e:
             if 'sampfrom must be shorter than the signal length' in str(e):
                 return Response({'error': 'sampfrom must be shorter than the signal length'},
