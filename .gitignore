@@ -174,4 +174,5 @@ datasets
 /src/backend/datasets/
 
 # Word Temp Files
-docs/~$*.docx
+**/~$*.docx
+**/*.tmp
