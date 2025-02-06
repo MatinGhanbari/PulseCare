@@ -129,12 +129,6 @@ Patient Pulse | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/hea
  - [Chart js](https://www.chartjs.org/docs/latest/)
  
 
-
-## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
-
-
 ## Contributing
 
 Contributions are always welcome!
