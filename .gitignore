@@ -172,6 +172,8 @@ cython_debug/
 
 datasets
 /src/backend/datasets/
+docs/document-files
+docs/presentation-files
 
 # Word Temp Files
 **/~$*.docx
