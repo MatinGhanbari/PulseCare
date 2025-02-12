@@ -748,8 +748,8 @@ main .timetable.active .closeBtn {
     }
 
     main .subjects {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1;
+        grid-template-columns: repeat(1, 1fr);
+        gap: 0;
     }
 
     main .statistics-container {
@@ -760,7 +760,7 @@ main .timetable.active .closeBtn {
     main .timetable {
         width: 150%;
         position: absolute;
-        padding: 4rem 0 0 0;
+        /*padding: 4rem 0 0 0;*/
     }
 }
 
@@ -832,7 +832,8 @@ main .timetable.active .closeBtn {
 
     .right {
         width: 100%;
-        padding: 2rem;
+        margin-top: 0;
+        padding: 0 2rem;
     }
 }
 
