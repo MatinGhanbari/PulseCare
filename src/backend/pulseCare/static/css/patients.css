@@ -425,3 +425,17 @@ input.range::-ms-fill-upper {
     color: var(--color-primary);
     text-shadow: var(--color-primary) 0 0 50px;
 }
+
+@media screen and (max-width: 1200px) {
+    .pulse-wrapper {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .pulse-wrapper {
+        width: 100%;
+        margin-left: 0;
+    }
+}

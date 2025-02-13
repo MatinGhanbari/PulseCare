@@ -6,6 +6,7 @@ let ann_detail_pointer = 0;
 let record_fs = 1;
 
 const sideMenu = document.querySelector("aside");
+const profile_btn = document.getElementById("profile-btn");
 const themeToggler = document.querySelector(".theme-toggler");
 const datetime = document.getElementById("datetime");
 const patientName = document.getElementById("patient-name");
@@ -28,6 +29,13 @@ const annotators = document.getElementById("annotators");
 const signals = document.getElementById("signals");
 const notes = document.getElementById("notes");
 
+profile_btn.addEventListener('click', () => {
+    if (!sideMenu.classList.contains("active")) {
+        sideMenu.classList.add("active");
+    } else {
+        sideMenu.classList.remove("active");
+    }
+});
 
 const patient_data_container = document.querySelectorAll(".patient-data-container");
 patient_data_container.forEach((container, index) => {
@@ -115,7 +123,7 @@ function deletePatient(patient_id) {
 
 async function fetchPatientDetailsData(patient) {
     const token = localStorage.getItem('token');
-    const response = await fetch(`http://127.0.0.1:8000/api/patients/${patient}/?format=json`, {
+    const response = await fetch(`/api/patients/${patient}/?format=json`, {
         method: 'GET', headers: {
             'Content-Type': 'application/json', 'Authorization': `${token}`
         }, credentials: 'include'
@@ -132,7 +140,7 @@ async function fetchECGData(patient, frame = 0) {
     const start = Math.floor(frame * frame_size);
     const token = localStorage.getItem('token');
 
-    const response = await fetch(`http://127.0.0.1:8000/api/ecg?format=json&patient=${patient}&start=${start}&length=${frame_size}`, {
+    const response = await fetch(`/api/ecg?format=json&patient=${patient}&start=${start}&length=${frame_size}`, {
         method: 'GET', headers: {
             'Content-Type': 'application/json', 'Authorization': `${token}`
         }, credentials: 'include'
@@ -192,6 +200,8 @@ async function updateChartData(ecg) {
 }
 
 async function renderECG(patient, frame = 0) {
+    let showScales = window.innerWidth >= 768;
+
     const ecg = await fetchECGData(patient, frame);
     const {
         ecg_data, // peaks
@@ -224,7 +234,7 @@ async function renderECG(patient, frame = 0) {
                     type: 'linear',
 
                     title: {
-                        display: true, text: 'Time (ms)',
+                        display: showScales, text: 'Time (ms)',
                     }, ticks: {
                         maxTicksLimit: 6, bounds: 'ticks', // Include bounds for the ticks
                         includeBounds: true, // Ensure the first and last ticks are included
@@ -239,7 +249,7 @@ async function renderECG(patient, frame = 0) {
                     }
                 }, y: {
                     title: {
-                        display: true, text: 'Amplitude (mV)'
+                        display: showScales, text: 'Amplitude (mV)'
                     }
                 }
             }, plugins: {

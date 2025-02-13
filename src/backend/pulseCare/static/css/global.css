@@ -762,6 +762,10 @@ main .timetable.active .closeBtn {
         position: absolute;
         /*padding: 4rem 0 0 0;*/
     }
+
+    main .control-subjects {
+        grid-template-columns:  1fr !important;
+    }
 }
 
 
@@ -834,6 +838,10 @@ main .timetable.active .closeBtn {
         width: 100%;
         margin-top: 0;
         padding: 0 2rem;
+    }
+
+    main .control-subjects {
+        grid-template-columns:  1fr !important;
     }
 }
 

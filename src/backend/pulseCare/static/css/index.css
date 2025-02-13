@@ -101,3 +101,33 @@ footer {
     background-color: var(--color-primary);
     box-shadow: 0 3px 5px 0 rgba(57, 108, 240, 0.3);
 }
+
+@media screen and (max-width: 768px) {
+    .edoc-logo-sub {
+        display: none;
+    }
+
+    .nav-item {
+        padding-left: 10px;
+    }
+
+    .heading-text {
+        padding-top: 100px;
+        font-size: 3rem;
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    .edoc-logo-sub {
+        display: none;
+    }
+
+    .nav-item {
+        padding-left: 10px;
+    }
+
+    .heading-text {
+        padding-top: 100px;
+        font-size: 3rem;
+    }
+}

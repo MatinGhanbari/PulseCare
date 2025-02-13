@@ -1,6 +1,15 @@
-const sideMenu = document.querySelector("aside");
 const themeToggler = document.querySelector(".theme-toggler");
 const datetime = document.getElementById("datetime");
+const sideMenu = document.querySelector("aside");
+const profile_btn = document.getElementById("profile-btn");
+
+profile_btn.addEventListener('click', () => {
+    if (!sideMenu.classList.contains("active")) {
+        sideMenu.classList.add("active");
+    } else {
+        sideMenu.classList.remove("active");
+    }
+});
 
 function updateDateTime() {
     const now = new Date();
