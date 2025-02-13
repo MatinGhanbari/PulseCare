@@ -114,9 +114,9 @@ run the following command:
 
 ## Mobile Screenshots
 
-| Dashboard | Patient Table | Patient Pulse |
-|-----------|---------------|---------------|
-| <img src="https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/mobile/dashboard.png" width="300" height="200"/> | <img src="https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/mobile/patient-table.png" width="300" height="200"/> | <img src="https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/mobile/patient-pulse.png" width="300" height="200"/> |
+Dashboard | Patient Table | Patient Pulse
+--- | -- | --- 
+![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/mobile/dashboard.png) | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/mobile/patient-table.png) | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/mobile/patient-pulse.png)
 
 ## Desktop Screenshots
 
