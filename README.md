@@ -112,13 +112,23 @@ run the following command:
 ```
 
 
-## Screenshots
+## Mobile Screenshots
 
 Page | ScreenShots
 --- | ---
-Dashboard | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/dashboard.png)
-Patient Table | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/patient-table.png)
-Patient Pulse | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/patient-pulse.png)
+Dashboard | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/mobile/dashboard.png)
+Side Menu | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/mobile/aside-menu.png)
+Patient Table | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/mobile/patient-table.png)
+Patient Pulse | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/mobile/patient-pulse.png)
+Patients | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/mobile/patients.png)
+
+## Desktop Screenshots
+
+Page | ScreenShots
+--- | ---
+Dashboard | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/desktop/dashboard.png)
+Patient Table | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/desktop/patient-table.png)
+Patient Pulse | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/desktop/patient-pulse.png)
 
 
 ## Acknowledgements
