@@ -175,4 +175,5 @@ datasets
 
 # Word Temp Files
 **/~$*.docx
+**/~$*.pptx
 **/*.tmp
