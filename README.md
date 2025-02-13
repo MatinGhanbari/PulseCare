@@ -116,7 +116,7 @@ run the following command:
 
 Dashboard | Patient Table | Patient Pulse
 --- | -- | --- 
-![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/mobile/dashboard.png) | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/mobile/patient-table.png) | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/mobile/patient-pulse.png)
+![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/mobile/dashboard.png) | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/mobile/patient-table.png) | ![image](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/assets/images/screenshots/mobile/patients-pulse.png)
 
 ## Desktop Screenshots
 
