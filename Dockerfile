@@ -8,7 +8,6 @@ RUN pip install --user -r requirements.txt
 
 COPY src .
 
-COPY ./.env .
 COPY ./runtime.txt .
 
 # Stage 2: Create the final image
