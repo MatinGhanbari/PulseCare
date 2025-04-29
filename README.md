@@ -3,6 +3,8 @@
 [![license](https://img.shields.io/badge/License-MIT-green)](https://github.com/MatinGhanbari/PulseCare/raw/refs/heads/main/LICENSE)
 [![django ci](https://github.com/MatinGhanbari/PulseCare/actions/workflows/django.yml/badge.svg)](https://github.com/MatinGhanbari/PulseCare/actions/workflows/django.yml)
 
+Wiki: [deepwiki.com/MatinGhanbari/PulseCare](https://deepwiki.com/MatinGhanbari/PulseCare)
+
 In the current era, with the increasing prevalence of cardiovascular diseases and the need for effective management of health data such as electrocardiograms (ECGs), the design and implementation of monitoring and analytical systems have emerged as key solutions in the field of digital health. This thesis focuses on the design and implementation of a web-based dashboard for cardiac patients, aiming to provide a practical and comprehensive tool for monitoring, analyzing, and displaying patient health data. The project leverages modern web technologies and advanced architectures to enable the collection, processing, and visualization of cardiac patient data through interactive charts, tables, and reports. Additionally, by analyzing patient data, the system facilitates the detection of abnormal patterns for both physicians and patients. The dashboard is implemented using technologies such as the Python programming language and the Django framework. This project represents a significant step toward improving the management of cardiovascular diseases and enhancing the quality of healthcare through digital technologies. It can serve as a foundation for the development of similar systems in the future.
 
 ## Features
